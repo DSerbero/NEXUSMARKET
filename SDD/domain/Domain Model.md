@@ -8,3 +8,8 @@ Parrafo
 
 # Domain Class Hierarchy
 
+---
+
+# Entities
+
+---
