@@ -13,3 +13,14 @@ Parrafo
 # Entities
 
 ---
+
+# Class
+
+## Description
+
+## Attributes
+
+| Attribute | Type | Description |
+|-----------|------|-------------|
+
+---
