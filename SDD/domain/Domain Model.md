@@ -2,42 +2,39 @@
 
 ## Introduction
 
-he Domain Model represents the core business entities of the NexusMarket Marketplace System. These entities encapsulate the business rules, data, and relationships described in the functional business specification.
+The Domain Model represents the core business entities of the NexusMarket Marketplace System. These entities encapsulate the business rules, data, and relationships described in the functional business specification.
 
 The model follows Object-Oriented Design principles and applies inheritance to eliminate duplicated information while promoting reusability and maintainability.
 
 ---
 
 # Domain Class Hierarchy
+
+```text
 User (Abstract)
-├── Seller
 ├── Buyer
-├── LogisticsOp
-├── Administrator
+├── Seller
+├── LogisticsOperator
+├── Admin
 └── Supervisor
 
-Warehouse (Abstract)
-├── MarketplaceWa
-└── SellersWa
-
 Product (Abstract)
-├── FisicPro
-└── DigitalPro
+├── PhysicalProduct
+└── DigitalProduct
 
+Warehouse (Abstract)
+├── MarketplaceWarehouse
+└── SellerWarehouse
 
 Inventory
-
-ShoppingCart
-
+Cart
 Order
-
 Invoice
+Shipment
+Return
+Refund
+```
 
-Shipping
-
-Returns
-
-Refunds
 ---
 
 # Entities
@@ -45,316 +42,316 @@ Refunds
 ---
 
 # User (Abstract)
- 
+
 ## Description
- 
-Represents any person authorized to interact with the NexusMarket system. This abstract class centralizes all common identification and access information shared by every role in the platform (Comprador, Vendedor, Operador, Admin, Supervisor).
- 
+
+Represents any person authorized to interact with the NexusMarket system. This abstract class centralizes all common identification and access information shared by every role in the platform (Buyer, Seller, LogisticsOperator, Admin, Supervisor).
+
 Each user has exactly one role and can only manage information within the scope of that role (business rules RG-02, RG-03).
- 
+
 This class cannot be instantiated directly.
- 
+
 ## Attributes
- 
+
 | Attribute | Type | Description |
 |-----------|------|-------------|
-| identificador | String | Uniquely identifies the user across the platform. |
-| nombreCompleto | String | Official name of the user. |
-| correoElectronico | String | Primary access and communication channel. Must be unique. |
-| rol | UserRole | Defines the responsibilities and permissions of the user. Unique per user. |
-| estado | UserStatus | Operational condition of the user (Active, Blocked, etc.). |
- 
+| identifier | String | Uniquely identifies the user across the platform. |
+| fullName | String | Official name of the user. |
+| email | String | Primary access and communication channel. Must be unique. |
+| role | UserRole | Defines the responsibilities and permissions of the user. Unique per user. |
+| status | UserStatus | Operational condition of the user (Active, Blocked, etc.). |
+
 ---
- 
+
 # Buyer
- 
+
 ## Description
- 
+
 Represents a customer who purchases products published on the Marketplace.
- 
-A comprador never manages information belonging to other compradores nor inventory data.
- 
+
+A buyer never manages information belonging to other buyers nor inventory data.
+
 ## Attributes
- 
+
 | Attribute | Type | Description |
 |-----------|------|-------------|
-| direccionPrincipal | String | Usual location for deliveries. |
-| direccionesAdicionales | List\<String\> | Secondary delivery locations. |
-| estadoComercial | BuyerStatus | Condition of the comprador for making purchases. |
- 
+| primaryAddress | String | Usual location for deliveries. |
+| additionalAddresses | List\<String\> | Secondary delivery locations. |
+| buyerStatus | BuyerStatus | Condition of the buyer for making purchases. |
+
 ---
- 
+
 # Seller
- 
+
 ## Description
- 
+
 Represents a party responsible for registering and managing products on the Marketplace.
- 
-Vendedores cannot self-register; they are onboarded exclusively by an Admin.
- 
+
+Sellers cannot self-register; they are onboarded exclusively by an Admin.
+
 ## Attributes
- 
+
 | Attribute | Type | Description |
 |-----------|------|-------------|
-| bodegasAsociadas | List\<Bodega\> | Warehouses linked to the vendedor's operation. |
-| catalogoProductos | List\<Producto\> | Products registered and managed by the vendedor. |
- 
+| associatedWarehouses | List\<Warehouse\> | Warehouses linked to the seller's operation. |
+| productCatalog | List\<Product\> | Products registered and managed by the seller. |
+
 ---
- 
-# LogisticsOp
- 
+
+# LogisticsOperator
+
 ## Description
- 
-Represents the party in charge of the physical operation of bodegas and order dispatch (Operador Logístico).
- 
+
+Represents the party in charge of the physical operation of warehouses and order dispatch.
+
 ## Attributes
- 
+
 | Attribute | Type | Description |
 |-----------|------|-------------|
-| bodegaAsignada | Bodega | Warehouse the operador is responsible for. |
- 
+| assignedWarehouse | Warehouse | Warehouse the operator is responsible for. |
+
 ---
- 
-# Administrator
- 
+
+# Admin
+
 ## Description
- 
-Represents the administrator responsible for managing vendedores and bodegas across the Marketplace.
- 
+
+Represents the administrator responsible for managing sellers and warehouses across the Marketplace.
+
 ## Attributes
- 
+
 | Attribute | Type | Description |
 |-----------|------|-------------|
-| permisosAdministrativos | List\<String\> | Administrative capabilities granted to the account. |
- 
+| administrativePermissions | List\<String\> | Administrative capabilities granted to the account. |
+
 ---
- 
+
 # Supervisor
- 
+
 ## Description
- 
+
 Represents a read-only profile used for consultation and operational monitoring across the system.
- 
+
 ## Attributes
- 
+
 | Attribute | Type | Description |
 |-----------|------|-------------|
-| ambitoConsulta | String | Scope of information the supervisor is authorized to view. |
- 
+| consultationScope | String | Scope of information the supervisor is authorized to view. |
+
 ---
- 
+
 # Product (Abstract)
- 
+
 ## Description
- 
+
 Represents any good offered for sale on the Marketplace, either physical or digital.
- 
+
 This class cannot be instantiated directly.
- 
+
 ## Attributes
- 
+
 | Attribute | Type | Description |
 |-----------|------|-------------|
-| tipoProducto | ProductType | Physical or Digital. |
-| variantes | List\<String\> | Differences such as color, size, model, etc. |
-| estado | ProductStatus | Published, Suspended, or Discontinued. |
-| vendedor | Vendedor | Vendedor who owns and manages the product. |
- 
+| productType | ProductType | Physical or Digital. |
+| variants | List\<String\> | Differences such as color, size, model, etc. |
+| status | ProductStatus | Published, Suspended, or Discontinued. |
+| seller | Seller | Seller who owns and manages the product. |
+
 ---
- 
-# FisicPro
- 
+
+# PhysicalProduct
+
 ## Description
- 
-Represents a tangible product that requires inventory tracking and physical dispatch through a bodega.
- 
+
+Represents a tangible product that requires inventory tracking and physical dispatch through a warehouse.
+
 ## Attributes
- 
+
 | Attribute | Type | Description |
 |-----------|------|-------------|
-| inventarioAsociado | Inventario | Stock record linking the product to a bodega. |
-| requiereEnvio | Boolean | Indicates the product must go through the logistics flow. |
- 
+| associatedInventory | Inventory | Stock record linking the product to a warehouse. |
+| requiresShipment | Boolean | Indicates the product must go through the logistics flow. |
+
 ---
- 
-# DigitalPro
- 
+
+# DigitalProduct
+
 ## Description
- 
-Represents an intangible product delivered immediately upon payment confirmation, without involving a bodega.
- 
+
+Represents an intangible product delivered immediately upon payment confirmation, without involving a warehouse.
+
 ## Attributes
- 
+
 | Attribute | Type | Description |
 |-----------|------|-------------|
-| entregaInmediata | Boolean | Confirms the product is delivered right after payment. |
-| recursoDigital | String | Reference to the digital asset delivered to the comprador. |
- 
+| immediateDelivery | Boolean | Confirms the product is delivered right after payment. |
+| digitalAsset | String | Reference to the digital asset delivered to the buyer. |
+
 ---
- 
+
 # Warehouse (Abstract)
- 
+
 ## Description
- 
+
 Represents a physical location where inventory is stored and managed.
- 
-Bodegas are classified according to who administers them: the Marketplace itself or a vendedor.
- 
+
+Warehouses are classified according to who administers them: the Marketplace itself or a seller.
+
 This class cannot be instantiated directly.
- 
+
 ## Attributes
- 
+
 | Attribute | Type | Description |
 |-----------|------|-------------|
-| identificador | String | Uniquely identifies the bodega. |
-| ubicacion | String | Physical location of the bodega. |
-| responsable | Usuario | User accountable for the bodega's operation. |
- 
+| identifier | String | Uniquely identifies the warehouse. |
+| location | String | Physical location of the warehouse. |
+| responsibleUser | User | User accountable for the warehouse's operation. |
+
 ---
- 
-# MarketplaceWa
- 
+
+# MarketplaceWarehouse
+
 ## Description
- 
+
 Represents a warehouse owned and operated directly by the Marketplace.
- 
+
 ## Attributes
- 
+
 | Attribute | Type | Description |
 |-----------|------|-------------|
-| operadorAsignado | Operador | Logistics operator responsible for daily operation. |
- 
+| assignedOperator | LogisticsOperator | Logistics operator responsible for daily operation. |
+
 ---
- 
-# SellersWa
- 
+
+# SellerWarehouse
+
 ## Description
- 
-Represents a warehouse owned and operated by a vendedor.
- 
+
+Represents a warehouse owned and operated by a seller.
+
 ## Attributes
- 
+
 | Attribute | Type | Description |
 |-----------|------|-------------|
-| vendedorPropietario | Vendedor | Vendedor who owns and operates the bodega. |
- 
+| ownerSeller | Seller | Seller who owns and operates the warehouse. |
+
 ---
- 
+
 # Inventory
- 
+
 ## Description
- 
-Represents the distributed stock of a product. It must always be linked to both a Producto and a Bodega, and negative stock is never permitted under any circumstance.
- 
+
+Represents the distributed stock of a product. It must always be linked to both a Product and a Warehouse, and negative stock is never permitted under any circumstance.
+
 ## Attributes
- 
+
 | Attribute | Type | Description |
 |-----------|------|-------------|
-| producto | ProductoFisico | Product this inventory record belongs to. |
-| bodega | Bodega | Warehouse where the stock is physically held. |
-| cantidadDisponible | Integer | Units currently available for commercialization. |
-| tipoMovimiento | MovementType | Ingreso, Reserva, Salida por venta, Ajuste, or Devolución. |
-| fechaMovimiento | LocalDateTime | Date and time of the last inventory movement. |
- 
+| product | PhysicalProduct | Product this inventory record belongs to. |
+| warehouse | Warehouse | Warehouse where the stock is physically held. |
+| availableQuantity | Integer | Units currently available for commercialization. |
+| movementType | MovementType | Stock In, Reservation, Sale Outbound, Adjustment, or Return Inbound. |
+| movementDate | LocalDateTime | Date and time of the last inventory movement. |
+
 ---
- 
-# ShoppingCart
- 
+
+# Cart
+
 ## Description
- 
-Represents the provisional selection of products made by a comprador before confirming a pedido. It is the initial state of the pedido lifecycle.
- 
+
+Represents the provisional selection of products made by a buyer before confirming an order. It is the initial state of the order lifecycle.
+
 ## Attributes
- 
+
 | Attribute | Type | Description |
 |-----------|------|-------------|
-| comprador | Comprador | Owner of the carrito. |
-| items | List\<Producto\> | Products provisionally selected. |
-| fechaCreacion | LocalDateTime | Date and time the carrito was created. |
- 
+| buyer | Buyer | Owner of the cart. |
+| items | List\<Product\> | Products provisionally selected. |
+| creationDate | LocalDateTime | Date and time the cart was created. |
+
 ---
- 
+
 # Order
- 
+
 ## Description
- 
-Represents the formal commercial commitment between a comprador and the Marketplace. It is the central entity of the system, progressing through a defined lifecycle: Carrito → Pendiente de Pago → Pagado → Despachado → Entregado/Finalizado. A finalized pedido cannot be modified under any circumstance.
- 
+
+Represents the formal commercial commitment between a buyer and the Marketplace. It is the central entity of the system, progressing through a defined lifecycle: Cart → Pending Payment → Paid → Dispatched → Delivered/Finalized. A finalized order cannot be modified under any circumstance.
+
 ## Attributes
- 
+
 | Attribute | Type | Description |
 |-----------|------|-------------|
-| comprador | Comprador | Comprador who placed the pedido. |
-| items | List\<Producto\> | Products included in the pedido. |
-| estadoPedido | OrderStatus | Current stage of the pedido lifecycle. |
-| fechaCreacion | LocalDateTime | Date and time the pedido was created. |
-| fechaFinalizacion | LocalDateTime | Date and time the pedido was completed. |
- 
+| buyer | Buyer | Buyer who placed the order. |
+| items | List\<Product\> | Products included in the order. |
+| orderStatus | OrderStatus | Current stage of the order lifecycle. |
+| creationDate | LocalDateTime | Date and time the order was created. |
+| completionDate | LocalDateTime | Date and time the order was completed. |
+
 ---
- 
+
 # Invoice
- 
+
 ## Description
- 
+
 Represents the commercial and financial information associated with a confirmed sale.
- 
+
 ## Attributes
- 
+
 | Attribute | Type | Description |
 |-----------|------|-------------|
-| pedido | Pedido | Pedido this factura is issued for. |
-| montoTotal | BigDecimal | Total invoiced amount. |
-| fechaEmision | LocalDateTime | Date and time the factura was issued. |
-| estadoFactura | InvoiceStatus | Current status of the factura. |
- 
+| order | Order | Order this invoice is issued for. |
+| totalAmount | BigDecimal | Total invoiced amount. |
+| issueDate | LocalDateTime | Date and time the invoice was issued. |
+| invoiceStatus | InvoiceStatus | Current status of the invoice. |
+
 ---
- 
-# Shipping
- 
+
+# Shipment
+
 ## Description
- 
-Represents the logistics process — packing, dispatch, and transport — applied to pedidos that contain physical products.
- 
+
+Represents the logistics process — packing, dispatch, and transport — applied to orders that contain physical products.
+
 ## Attributes
- 
+
 | Attribute | Type | Description |
 |-----------|------|-------------|
-| pedido | Pedido | Pedido being shipped. |
-| bodegaOrigen | Bodega | Warehouse from which the shipment departs. |
-| operador | Operador | Operator responsible for the dispatch. |
-| estadoEnvio | ShipmentStatus | Current status of the shipment. |
-| fechaDespacho | LocalDateTime | Date and time the shipment left the bodega. |
- 
+| order | Order | Order being shipped. |
+| originWarehouse | Warehouse | Warehouse from which the shipment departs. |
+| operator | LogisticsOperator | Operator responsible for the dispatch. |
+| shipmentStatus | ShipmentStatus | Current status of the shipment. |
+| dispatchDate | LocalDateTime | Date and time the shipment left the warehouse. |
+
 ---
- 
-# Returns
- 
+
+# Return
+
 ## Description
- 
-Represents a post-sale process initiated when a comprador returns a delivered product. Subject to critical validations on the related inventory.
- 
+
+Represents a post-sale process initiated when a buyer returns a delivered product. Subject to critical validations on the related inventory.
+
 ## Attributes
- 
+
 | Attribute | Type | Description |
 |-----------|------|-------------|
-| pedido | Pedido | Pedido associated with the devolución. |
-| motivo | String | Reason for the return. |
-| estadoDevolucion | ReturnStatus | Current status of the devolución. |
-| fechaSolicitud | LocalDateTime | Date and time the devolución was requested. |
- 
+| order | Order | Order associated with the return. |
+| reason | String | Reason for the return. |
+| returnStatus | ReturnStatus | Current status of the return. |
+| requestDate | LocalDateTime | Date and time the return was requested. |
+
 ---
- 
-# Refunds
- 
+
+# Refund
+
 ## Description
- 
-Represents the financial reimbursement issued to a comprador as a result of an approved devolución.
- 
+
+Represents the financial reimbursement issued to a buyer as a result of an approved return.
+
 ## Attributes
- 
+
 | Attribute | Type | Description |
 |-----------|------|-------------|
-| devolucion | Devolucion | Devolución that originated the reembolso. |
-| montoReembolsado | BigDecimal | Amount returned to the comprador. |
-| estadoReembolso | RefundStatus | Current status of the reembolso. |
-| fechaProcesamiento | LocalDateTime | Date and time the reembolso was processed. |
+| relatedReturn | Return | Return that originated the refund. |
+| refundedAmount | BigDecimal | Amount returned to the buyer. |
+| refundStatus | RefundStatus | Current status of the refund. |
+| processingDate | LocalDateTime | Date and time the refund was processed. |
