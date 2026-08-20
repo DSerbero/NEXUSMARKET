@@ -18,9 +18,7 @@ User (Abstract)
 ├── Admin
 └── Supervisor
 
-Product (Abstract)
-├── PhysicalProduct
-└── DigitalProduct
+Product
 
 Warehouse (Abstract)
 ├── MarketplaceWarehouse
@@ -189,15 +187,13 @@ Represents an intangible product delivered immediately upon payment confirmation
 
 ---
 
-# Warehouse (Abstract)
+# Warehouse 
 
 ## Description
 
 Represents a physical location where inventory is stored and managed.
 
 Warehouses are classified according to who administers them: the Marketplace itself or a seller.
-
-This class cannot be instantiated directly.
 
 ## Attributes
 
@@ -206,34 +202,6 @@ This class cannot be instantiated directly.
 | identifier | String | Uniquely identifies the warehouse. |
 | location | String | Physical location of the warehouse. |
 | responsibleUser | User | User accountable for the warehouse's operation. |
-
----
-
-# MarketplaceWarehouse
-
-## Description
-
-Represents a warehouse owned and operated directly by the Marketplace.
-
-## Attributes
-
-| Attribute | Type | Description |
-|-----------|------|-------------|
-| assignedOperator | LogisticsOperator | Logistics operator responsible for daily operation. |
-
----
-
-# SellerWarehouse
-
-## Description
-
-Represents a warehouse owned and operated by a seller.
-
-## Attributes
-
-| Attribute | Type | Description |
-|-----------|------|-------------|
-| ownerSeller | Seller | Seller who owns and operates the warehouse. |
 
 ---
 
