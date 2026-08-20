@@ -215,7 +215,7 @@ Represents the distributed stock of a product. It must always be linked to both 
 
 | Attribute | Type | Description |
 |-----------|------|-------------|
-| product | PhysicalProduct | Product this inventory record belongs to. |
+| product | List<Product> | Product this inventory record belongs to. |
 | warehouse | Warehouse | Warehouse where the stock is physically held. |
 | availableQuantity | Integer | Units currently available for commercialization. |
 | movementType | MovementType | Stock In, Reservation, Sale Outbound, Adjustment, or Return Inbound. |
