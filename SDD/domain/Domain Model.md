@@ -19,7 +19,7 @@ User (Abstract)
 └── Supervisor
 
 Product (Abstract)
-├── PhisicalProduct
+├── PhysicalProduct
 └── DigitalProduct
 
 Warehouse 
