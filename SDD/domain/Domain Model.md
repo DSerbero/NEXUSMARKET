@@ -18,11 +18,11 @@ User (Abstract)
 ├── Admin
 └── Supervisor
 
-Product
+Product (Abstract)
+├── PhisicalProduct
+└── DigitalProduct
 
-Warehouse (Abstract)
-├── MarketplaceWarehouse
-└── SellerWarehouse
+Warehouse 
 
 Inventory
 Cart
