@@ -2,9 +2,9 @@
 
 ## Introduction
 
-The Domain Model represents the core business entities of the NexusMarket Marketplace System. These entities encapsulate the business rules, data, and relationships described in the functional business specification.
+El Domain Model representa las entidades de negocio centrales del sistema Marketplace NexusMarket. Estas entidades encapsulan las reglas de negocio, los datos y las relaciones descritas en la especificación funcional.
 
-The model follows Object-Oriented Design principles and applies inheritance to eliminate duplicated information while promoting reusability and maintainability.
+El modelo sigue principios de Diseño Orientado a Objetos y aplica herencia para eliminar información duplicada, promoviendo la reutilización y el mantenimiento.
 
 ---
 
@@ -22,7 +22,9 @@ Product (Abstract)
 ├── PhysicalProduct
 └── DigitalProduct
 
-Warehouse 
+Warehouse (Abstract)
+├── MarketplaceWarehouse
+└── SellerWarehouse
 
 Inventory
 Cart
@@ -43,21 +45,21 @@ Refund
 
 ## Description
 
-Represents any person authorized to interact with the NexusMarket system. This abstract class centralizes all common identification and access information shared by every role in the platform (Buyer, Seller, LogisticsOperator, Admin, Supervisor).
+Representa a cualquier persona autorizada para interactuar con el sistema NexusMarket. Esta clase abstracta centraliza la información de identificación y acceso común a todos los roles de la plataforma (Buyer, Seller, LogisticsOperator, Admin, Supervisor).
 
-Each user has exactly one role and can only manage information within the scope of that role (business rules RG-02, RG-03).
+Cada usuario tiene exactamente un rol y solo puede gestionar información dentro del alcance de ese rol (reglas de negocio RG-02, RG-03).
 
-This class cannot be instantiated directly.
+Esta clase no puede instanciarse directamente.
 
 ## Attributes
 
 | Attribute | Type | Description |
 |-----------|------|-------------|
-| identifier | String | Uniquely identifies the user across the platform. |
-| fullName | String | Official name of the user. |
-| email | String | Primary access and communication channel. Must be unique. |
-| role | UserRole | Defines the responsibilities and permissions of the user. Unique per user. |
-| status | UserStatus | Operational condition of the user (Active, Blocked, etc.). |
+| identifier | String | Identifica de forma única al usuario en toda la plataforma. |
+| fullName | String | Nombre oficial del usuario. |
+| email | String | Canal principal de acceso y comunicación. Debe ser único. |
+| role | UserRole | Define las responsabilidades y permisos del usuario. Único por usuario. |
+| status | UserStatus | Condición operativa del usuario (Activo, Bloqueado, etc.). |
 
 ---
 
@@ -65,17 +67,17 @@ This class cannot be instantiated directly.
 
 ## Description
 
-Represents a customer who purchases products published on the Marketplace.
+Representa a un cliente que compra productos publicados en el Marketplace.
 
-A buyer never manages information belonging to other buyers nor inventory data.
+Un buyer nunca gestiona información de otros buyers ni datos de inventario.
 
 ## Attributes
 
 | Attribute | Type | Description |
 |-----------|------|-------------|
-| primaryAddress | String | Usual location for deliveries. |
-| additionalAddresses | List\<String\> | Secondary delivery locations. |
-| buyerStatus | BuyerStatus | Condition of the buyer for making purchases. |
+| primaryAddress | String | Ubicación habitual para las entregas. |
+| additionalAddresses | List\<String\> | Ubicaciones de entrega secundarias. |
+| buyerStatus | BuyerStatus | Condición del buyer para realizar compras. |
 
 ---
 
@@ -83,16 +85,16 @@ A buyer never manages information belonging to other buyers nor inventory data.
 
 ## Description
 
-Represents a party responsible for registering and managing products on the Marketplace.
+Representa a la parte responsable de registrar y gestionar productos en el Marketplace.
 
-Sellers cannot self-register; they are onboarded exclusively by an Admin.
+Los sellers no pueden autoregistrarse; son incorporados exclusivamente por un Admin.
 
 ## Attributes
 
 | Attribute | Type | Description |
 |-----------|------|-------------|
-| associatedWarehouses | List\<Warehouse\> | Warehouses linked to the seller's operation. |
-| productCatalog | List\<Product\> | Products registered and managed by the seller. |
+| associatedWarehouses | List\<Warehouse\> | Bodegas vinculadas a la operación del seller. |
+| productCatalog | List\<Product\> | Productos registrados y gestionados por el seller. |
 
 ---
 
@@ -100,13 +102,13 @@ Sellers cannot self-register; they are onboarded exclusively by an Admin.
 
 ## Description
 
-Represents the party in charge of the physical operation of warehouses and order dispatch.
+Representa a la parte encargada de la operación física de las bodegas y del despacho de pedidos.
 
 ## Attributes
 
 | Attribute | Type | Description |
 |-----------|------|-------------|
-| assignedWarehouse | Warehouse | Warehouse the operator is responsible for. |
+| assignedWarehouse | Warehouse | Bodega bajo responsabilidad del operator. |
 
 ---
 
@@ -114,13 +116,13 @@ Represents the party in charge of the physical operation of warehouses and order
 
 ## Description
 
-Represents the administrator responsible for managing sellers and warehouses across the Marketplace.
+Representa al administrador responsable de gestionar sellers y warehouses en todo el Marketplace.
 
 ## Attributes
 
 | Attribute | Type | Description |
 |-----------|------|-------------|
-| administrativePermissions | List\<String\> | Administrative capabilities granted to the account. |
+| administrativePermissions | List\<String\> | Capacidades administrativas otorgadas a la cuenta. |
 
 ---
 
@@ -128,13 +130,13 @@ Represents the administrator responsible for managing sellers and warehouses acr
 
 ## Description
 
-Represents a read-only profile used for consultation and operational monitoring across the system.
+Representa un perfil de solo lectura utilizado para consulta y seguimiento operativo en todo el sistema.
 
 ## Attributes
 
 | Attribute | Type | Description |
 |-----------|------|-------------|
-| consultationScope | String | Scope of information the supervisor is authorized to view. |
+| consultationScope | String | Alcance de información que el supervisor está autorizado a ver. |
 
 ---
 
@@ -142,18 +144,18 @@ Represents a read-only profile used for consultation and operational monitoring 
 
 ## Description
 
-Represents any good offered for sale on the Marketplace, either physical or digital.
+Representa cualquier bien ofrecido para la venta en el Marketplace, ya sea físico o digital.
 
-This class cannot be instantiated directly.
+Esta clase no puede instanciarse directamente.
 
 ## Attributes
 
 | Attribute | Type | Description |
 |-----------|------|-------------|
-| productType | ProductType | Physical or Digital. |
-| variants | List\<String\> | Differences such as color, size, model, etc. |
-| status | ProductStatus | Published, Suspended, or Discontinued. |
-| seller | Seller | Seller who owns and manages the product. |
+| productType | ProductType | Físico o Digital. |
+| variants | List\<String\> | Diferencias como color, talla, modelo, etc. |
+| status | ProductStatus | Publicado, Suspendido o Descontinuado. |
+| seller | Seller | Seller propietario y responsable del producto. |
 
 ---
 
@@ -161,14 +163,14 @@ This class cannot be instantiated directly.
 
 ## Description
 
-Represents a tangible product that requires inventory tracking and physical dispatch through a warehouse.
+Representa un producto tangible que requiere control de inventario y despacho físico a través de una warehouse.
 
 ## Attributes
 
 | Attribute | Type | Description |
 |-----------|------|-------------|
-| associatedInventory | Inventory | Stock record linking the product to a warehouse. |
-| requiresShipment | Boolean | Indicates the product must go through the logistics flow. |
+| associatedInventory | Inventory | Registro de stock que vincula el producto con una warehouse. |
+| requiresShipment | Boolean | Indica que el producto debe pasar por el flujo logístico. |
 
 ---
 
@@ -176,32 +178,62 @@ Represents a tangible product that requires inventory tracking and physical disp
 
 ## Description
 
-Represents an intangible product delivered immediately upon payment confirmation, without involving a warehouse.
+Representa un producto intangible que se entrega inmediatamente tras la confirmación del pago, sin pasar por una warehouse.
 
 ## Attributes
 
 | Attribute | Type | Description |
 |-----------|------|-------------|
-| immediateDelivery | Boolean | Confirms the product is delivered right after payment. |
-| digitalAsset | String | Reference to the digital asset delivered to the buyer. |
+| immediateDelivery | Boolean | Confirma que el producto se entrega justo después del pago. |
+| digitalAsset | String | Referencia al recurso digital entregado al buyer. |
 
 ---
 
-# Warehouse 
+# Warehouse (Abstract)
 
 ## Description
 
-Represents a physical location where inventory is stored and managed.
+Representa una ubicación física donde se almacena y gestiona el inventario.
 
-Warehouses are classified according to who administers them: the Marketplace itself or a seller.
+Las warehouses se clasifican según quién las administra: el propio Marketplace o un seller.
+
+Esta clase no puede instanciarse directamente.
 
 ## Attributes
 
 | Attribute | Type | Description |
 |-----------|------|-------------|
-| identifier | String | Uniquely identifies the warehouse. |
-| location | String | Physical location of the warehouse. |
-| responsibleUser | User | User accountable for the warehouse's operation. |
+| identifier | String | Identifica de forma única a la warehouse. |
+| location | String | Ubicación física de la warehouse. |
+| responsibleUser | User | Usuario responsable de la operación de la warehouse. |
+
+---
+
+# MarketplaceWarehouse
+
+## Description
+
+Representa una bodega propiedad del Marketplace y operada directamente por este.
+
+## Attributes
+
+| Attribute | Type | Description |
+|-----------|------|-------------|
+| assignedOperator | LogisticsOperator | Operador logístico responsable de la operación diaria. |
+
+---
+
+# SellerWarehouse
+
+## Description
+
+Representa una bodega propiedad de un seller y operada por este.
+
+## Attributes
+
+| Attribute | Type | Description |
+|-----------|------|-------------|
+| ownerSeller | Seller | Seller propietario y operador de la warehouse. |
 
 ---
 
@@ -209,17 +241,17 @@ Warehouses are classified according to who administers them: the Marketplace its
 
 ## Description
 
-Represents the distributed stock of a product. It must always be linked to both a Product and a Warehouse, and negative stock is never permitted under any circumstance.
+Representa el stock distribuido de un producto. Debe estar siempre vinculado tanto a un Product como a una Warehouse, y en ningún caso se permite stock negativo.
 
 ## Attributes
 
 | Attribute | Type | Description |
 |-----------|------|-------------|
-| product | List<Product> | Product this inventory record belongs to. |
-| warehouse | Warehouse | Warehouse where the stock is physically held. |
-| availableQuantity | Integer | Units currently available for commercialization. |
-| movementType | MovementType | Stock In, Reservation, Sale Outbound, Adjustment, or Return Inbound. |
-| movementDate | LocalDateTime | Date and time of the last inventory movement. |
+| product | PhysicalProduct | Producto al que pertenece este registro de inventario. |
+| warehouse | Warehouse | Bodega donde se almacena físicamente el stock. |
+| availableQuantity | Integer | Unidades actualmente disponibles para comercialización. |
+| movementType | MovementType | Stock In, Reservation, Sale Outbound, Adjustment o Return Inbound. |
+| movementDate | LocalDateTime | Fecha y hora del último movimiento de inventario. |
 
 ---
 
@@ -227,15 +259,15 @@ Represents the distributed stock of a product. It must always be linked to both 
 
 ## Description
 
-Represents the provisional selection of products made by a buyer before confirming an order. It is the initial state of the order lifecycle.
+Representa la selección provisional de productos realizada por un buyer antes de confirmar un order. Es el estado inicial del ciclo de vida del order.
 
 ## Attributes
 
 | Attribute | Type | Description |
 |-----------|------|-------------|
-| buyer | Buyer | Owner of the cart. |
-| items | List\<Product\> | Products provisionally selected. |
-| creationDate | LocalDateTime | Date and time the cart was created. |
+| buyer | Buyer | Propietario del cart. |
+| items | List\<Product\> | Productos seleccionados provisionalmente. |
+| creationDate | LocalDateTime | Fecha y hora de creación del cart. |
 
 ---
 
@@ -243,17 +275,17 @@ Represents the provisional selection of products made by a buyer before confirmi
 
 ## Description
 
-Represents the formal commercial commitment between a buyer and the Marketplace. It is the central entity of the system, progressing through a defined lifecycle: Cart → Pending Payment → Paid → Dispatched → Delivered/Finalized. A finalized order cannot be modified under any circumstance.
+Representa el compromiso comercial formal entre un buyer y el Marketplace. Es la entidad central del sistema y avanza a través de un ciclo de vida definido: Cart → Pending Payment → Paid → Dispatched → Delivered/Finalized. Un order finalizado no puede modificarse bajo ninguna circunstancia.
 
 ## Attributes
 
 | Attribute | Type | Description |
 |-----------|------|-------------|
-| buyer | Buyer | Buyer who placed the order. |
-| items | List\<Product\> | Products included in the order. |
-| orderStatus | OrderStatus | Current stage of the order lifecycle. |
-| creationDate | LocalDateTime | Date and time the order was created. |
-| completionDate | LocalDateTime | Date and time the order was completed. |
+| buyer | Buyer | Buyer que realizó el order. |
+| items | List\<Product\> | Productos incluidos en el order. |
+| orderStatus | OrderStatus | Etapa actual del ciclo de vida del order. |
+| creationDate | LocalDateTime | Fecha y hora de creación del order. |
+| completionDate | LocalDateTime | Fecha y hora de finalización del order. |
 
 ---
 
@@ -261,16 +293,16 @@ Represents the formal commercial commitment between a buyer and the Marketplace.
 
 ## Description
 
-Represents the commercial and financial information associated with a confirmed sale.
+Representa la información comercial y financiera asociada a una venta ya confirmada.
 
 ## Attributes
 
 | Attribute | Type | Description |
 |-----------|------|-------------|
-| order | Order | Order this invoice is issued for. |
-| totalAmount | BigDecimal | Total invoiced amount. |
-| issueDate | LocalDateTime | Date and time the invoice was issued. |
-| invoiceStatus | InvoiceStatus | Current status of the invoice. |
+| order | Order | Order por el cual se emite este invoice. |
+| totalAmount | BigDecimal | Monto total facturado. |
+| issueDate | LocalDateTime | Fecha y hora de emisión del invoice. |
+| invoiceStatus | InvoiceStatus | Estado actual del invoice. |
 
 ---
 
@@ -278,17 +310,17 @@ Represents the commercial and financial information associated with a confirmed 
 
 ## Description
 
-Represents the logistics process — packing, dispatch, and transport — applied to orders that contain physical products.
+Representa el proceso logístico —empaque, despacho y transporte— aplicado a los orders que contienen productos físicos.
 
 ## Attributes
 
 | Attribute | Type | Description |
 |-----------|------|-------------|
-| order | Order | Order being shipped. |
-| originWarehouse | Warehouse | Warehouse from which the shipment departs. |
-| operator | LogisticsOperator | Operator responsible for the dispatch. |
-| shipmentStatus | ShipmentStatus | Current status of the shipment. |
-| dispatchDate | LocalDateTime | Date and time the shipment left the warehouse. |
+| order | Order | Order que está siendo enviado. |
+| originWarehouse | Warehouse | Bodega desde la cual parte el envío. |
+| operator | LogisticsOperator | Operador responsable del despacho. |
+| shipmentStatus | ShipmentStatus | Estado actual del envío. |
+| dispatchDate | LocalDateTime | Fecha y hora en que el envío salió de la warehouse. |
 
 ---
 
@@ -296,16 +328,16 @@ Represents the logistics process — packing, dispatch, and transport — applie
 
 ## Description
 
-Represents a post-sale process initiated when a buyer returns a delivered product. Subject to critical validations on the related inventory.
+Representa el proceso posventa iniciado cuando un buyer devuelve un producto ya entregado. Está sujeto a validaciones críticas sobre el inventario relacionado.
 
 ## Attributes
 
 | Attribute | Type | Description |
 |-----------|------|-------------|
-| order | Order | Order associated with the return. |
-| reason | String | Reason for the return. |
-| returnStatus | ReturnStatus | Current status of the return. |
-| requestDate | LocalDateTime | Date and time the return was requested. |
+| order | Order | Order asociado al return. |
+| reason | String | Motivo de la devolución. |
+| returnStatus | ReturnStatus | Estado actual del return. |
+| requestDate | LocalDateTime | Fecha y hora de solicitud del return. |
 
 ---
 
@@ -313,13 +345,13 @@ Represents a post-sale process initiated when a buyer returns a delivered produc
 
 ## Description
 
-Represents the financial reimbursement issued to a buyer as a result of an approved return.
+Representa el reembolso financiero emitido a un buyer como resultado de un return aprobado.
 
 ## Attributes
 
 | Attribute | Type | Description |
 |-----------|------|-------------|
-| relatedReturn | Return | Return that originated the refund. |
-| refundedAmount | BigDecimal | Amount returned to the buyer. |
-| refundStatus | RefundStatus | Current status of the refund. |
-| processingDate | LocalDateTime | Date and time the refund was processed. |
+| relatedReturn | Return | Return que dio origen al refund. |
+| refundedAmount | BigDecimal | Monto devuelto al buyer. |
+| refundStatus | RefundStatus | Estado actual del refund. |
+| processingDate | LocalDateTime | Fecha y hora en que se procesó el refund. |

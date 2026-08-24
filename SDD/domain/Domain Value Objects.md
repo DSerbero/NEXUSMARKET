@@ -2,9 +2,9 @@
 
 ## Introduction
 
-Value Objects represent immutable concepts within the NexusMarket domain. Unlike Entities, they do not have their own identity; instead, they are defined entirely by their attributes.
+Los Value Objects representan conceptos inmutables dentro del dominio de NexusMarket. A diferencia de las Entities, no tienen identidad propia; se definen completamente por sus atributos.
 
-These objects encapsulate controlled business values, improve domain expressiveness, and prevent the use of primitive types or scattered string literals throughout the application.
+Estos objetos encapsulan valores de negocio controlados, mejoran la expresividad del dominio y evitan el uso de tipos primitivos o literales de texto dispersos en toda la aplicación.
 
 ---
 
@@ -31,17 +31,17 @@ DomainCatalog (Abstract)
 
 ## Description
 
-Represents a generic business catalog used throughout the NexusMarket domain.
+Representa un catálogo de negocio genérico utilizado en todo el dominio de NexusMarket.
 
-All controlled business values inherit from this class, ensuring a consistent structure across the application.
+Todos los valores de negocio controlados heredan de esta clase, garantizando una estructura consistente en toda la aplicación.
 
 ## Attributes
 
 | Attribute | Type | Description |
 |-----------|------|-------------|
-| code | String | Unique business identifier. |
-| name | String | Human-readable name displayed within the application. |
-| description | String | Business definition of the catalog value. |
+| code | String | Identificador de negocio único. |
+| name | String | Nombre legible mostrado dentro de la aplicación. |
+| description | String | Definición de negocio del valor del catálogo. |
 
 ---
 
@@ -49,9 +49,9 @@ All controlled business values inherit from this class, ensuring a consistent st
 
 ## Description
 
-Represents the responsibilities and permissions assigned to a system user.
+Representa las responsabilidades y permisos asignados a un usuario del sistema.
 
-Each user has exactly one role, and roles determine which business operations a user may perform (RG-02, RG-03).
+Cada usuario tiene exactamente un rol, y los roles determinan qué operaciones de negocio puede realizar (RG-02, RG-03).
 
 ## Inherits From
 
@@ -61,11 +61,11 @@ DomainCatalog
 
 | Code | Name | Description |
 |------|------|-------------|
-| BUYER | Buyer | Purchases products published on the Marketplace. |
-| SELLER | Seller | Registers and manages products; onboarded only by an Admin. |
-| LOGISTICS_OPERATOR | Logistics Operator | Handles physical operation of warehouses and dispatch. |
-| ADMIN | Admin | Manages sellers and warehouses. |
-| SUPERVISOR | Supervisor | Read-only profile for consultation and monitoring. |
+| BUYER | Buyer | Compra productos publicados en el Marketplace. |
+| SELLER | Seller | Registra y gestiona productos; incorporado únicamente por un Admin. |
+| LOGISTICS_OPERATOR | Logistics Operator | Gestiona la operación física de las warehouses y el despacho. |
+| ADMIN | Admin | Gestiona sellers y warehouses. |
+| SUPERVISOR | Supervisor | Perfil de solo lectura para consulta y seguimiento. |
 
 ---
 
@@ -73,7 +73,7 @@ DomainCatalog
 
 ## Description
 
-Represents the operational condition of a user within the Marketplace.
+Representa la condición operativa de un usuario dentro del Marketplace.
 
 ## Inherits From
 
@@ -83,9 +83,9 @@ DomainCatalog
 
 | Code | Name | Description |
 |------|------|-------------|
-| ACTIVE | Active | User can access and operate on the system normally. |
-| BLOCKED | Blocked | User access has been suspended. |
-| INACTIVE | Inactive | User exists but is not currently operating on the platform. |
+| ACTIVE | Active | El usuario puede acceder y operar normalmente en el sistema. |
+| BLOCKED | Blocked | El acceso del usuario ha sido suspendido. |
+| INACTIVE | Inactive | El usuario existe pero actualmente no opera en la plataforma. |
 
 ---
 
@@ -93,7 +93,7 @@ DomainCatalog
 
 ## Description
 
-Represents the commercial condition of a buyer for making purchases.
+Representa la condición comercial de un buyer para realizar compras.
 
 ## Inherits From
 
@@ -103,8 +103,8 @@ DomainCatalog
 
 | Code | Name | Description |
 |------|------|-------------|
-| ENABLED | Enabled | Buyer can place orders normally. |
-| SUSPENDED | Suspended | Buyer is temporarily restricted from purchasing. |
+| ENABLED | Enabled | El buyer puede realizar orders con normalidad. |
+| SUSPENDED | Suspended | El buyer tiene restricción temporal para comprar. |
 
 ---
 
@@ -112,7 +112,7 @@ DomainCatalog
 
 ## Description
 
-Represents whether a product is physical or digital, determining whether it requires inventory and dispatch.
+Representa si un producto es físico o digital, determinando si requiere inventario y despacho.
 
 ## Inherits From
 
@@ -122,8 +122,8 @@ DomainCatalog
 
 | Code | Name | Description |
 |------|------|-------------|
-| PHYSICAL | Physical | Requires inventory tracking and dispatch. |
-| DIGITAL | Digital | Delivered immediately after payment confirmation. |
+| PHYSICAL | Physical | Requiere control de inventario y despacho. |
+| DIGITAL | Digital | Se entrega inmediatamente tras confirmar el pago. |
 
 ---
 
@@ -131,7 +131,7 @@ DomainCatalog
 
 ## Description
 
-Represents the visibility state of a product in the catalog.
+Representa el estado de visibilidad de un producto en el catálogo.
 
 ## Inherits From
 
@@ -141,9 +141,9 @@ DomainCatalog
 
 | Code | Name | Description |
 |------|------|-------------|
-| PUBLISHED | Published | Product is visible in the public catalog. |
-| SUSPENDED | Suspended | Product is temporarily hidden from the catalog. |
-| DISCONTINUED | Discontinued | Product is permanently removed from sale. |
+| PUBLISHED | Published | El producto es visible en el catálogo público. |
+| SUSPENDED | Suspended | El producto está temporalmente oculto del catálogo. |
+| DISCONTINUED | Discontinued | El producto se retira de forma permanente de la venta. |
 
 ---
 
@@ -151,7 +151,7 @@ DomainCatalog
 
 ## Description
 
-Represents the type of movement applied to an inventory record.
+Representa el tipo de movimiento aplicado a un registro de inventario.
 
 ## Inherits From
 
@@ -161,11 +161,11 @@ DomainCatalog
 
 | Code | Name | Description |
 |------|------|-------------|
-| STOCK_IN | Stock In | Stock added to the warehouse. |
-| RESERVATION | Reservation | Stock reserved for a pending order. |
-| SALE_OUTBOUND | Sale Outbound | Stock removed due to a confirmed sale. |
-| ADJUSTMENT | Adjustment | Manual correction of stock quantity. |
-| RETURN_INBOUND | Return Inbound | Stock returned after a return. |
+| STOCK_IN | Stock In | Stock ingresado a la warehouse. |
+| RESERVATION | Reservation | Stock reservado para un order pendiente. |
+| SALE_OUTBOUND | Sale Outbound | Stock retirado por una venta confirmada. |
+| ADJUSTMENT | Adjustment | Corrección manual de la cantidad de stock. |
+| RETURN_INBOUND | Return Inbound | Stock reingresado tras un return. |
 
 ---
 
@@ -173,7 +173,7 @@ DomainCatalog
 
 ## Description
 
-Represents the current stage of an order within its lifecycle. An order in a final state cannot be modified under any circumstance.
+Representa la etapa actual de un order dentro de su ciclo de vida. Un order en estado final no puede modificarse bajo ninguna circunstancia.
 
 ## Inherits From
 
@@ -183,11 +183,11 @@ DomainCatalog
 
 | Code | Name | Description |
 |------|------|-------------|
-| CART | Cart | Provisional product selection. |
-| PENDING_PAYMENT | Pending Payment | Awaiting financial confirmation. |
-| PAID | Paid | Payment confirmed; preparation begins. |
-| DISPATCHED | Dispatched | Order has physically left the warehouse. |
-| DELIVERED_FINALIZED | Delivered / Finalized | Delivery confirmed; order lifecycle complete. |
+| CART | Cart | Selección provisional de productos. |
+| PENDING_PAYMENT | Pending Payment | En espera de confirmación financiera. |
+| PAID | Paid | Pago confirmado; inicia la preparación. |
+| DISPATCHED | Dispatched | El order ha salido físicamente de la warehouse. |
+| DELIVERED_FINALIZED | Delivered / Finalized | Entrega confirmada; ciclo de vida del order completo. |
 
 ---
 
@@ -195,7 +195,7 @@ DomainCatalog
 
 ## Description
 
-Represents the current status of an invoice issued for an order.
+Representa el estado actual de un invoice emitido para un order.
 
 ## Inherits From
 
@@ -205,9 +205,9 @@ DomainCatalog
 
 | Code | Name | Description |
 |------|------|-------------|
-| ISSUED | Issued | Invoice has been generated. |
-| PAID | Paid | Invoice amount has been collected. |
-| VOIDED | Voided | Invoice has been cancelled. |
+| ISSUED | Issued | El invoice ha sido generado. |
+| PAID | Paid | El monto del invoice ha sido recaudado. |
+| VOIDED | Voided | El invoice ha sido anulado. |
 
 ---
 
@@ -215,7 +215,7 @@ DomainCatalog
 
 ## Description
 
-Represents the current status of a shipment for a physical order.
+Representa el estado actual de un shipment para un order físico.
 
 ## Inherits From
 
@@ -225,10 +225,10 @@ DomainCatalog
 
 | Code | Name | Description |
 |------|------|-------------|
-| IN_PREPARATION | In Preparation | Order is being packed at the warehouse. |
-| DISPATCHED | Dispatched | Shipment has left the warehouse. |
-| IN_TRANSIT | In Transit | Shipment is being transported. |
-| DELIVERED | Delivered | Shipment reached the buyer. |
+| IN_PREPARATION | In Preparation | El order está siendo empacado en la warehouse. |
+| DISPATCHED | Dispatched | El shipment ha salido de la warehouse. |
+| IN_TRANSIT | In Transit | El shipment está en transporte. |
+| DELIVERED | Delivered | El shipment llegó al buyer. |
 
 ---
 
@@ -236,7 +236,7 @@ DomainCatalog
 
 ## Description
 
-Represents the current status of a return requested by a buyer.
+Representa el estado actual de un return solicitado por un buyer.
 
 ## Inherits From
 
@@ -246,10 +246,10 @@ DomainCatalog
 
 | Code | Name | Description |
 |------|------|-------------|
-| REQUESTED | Requested | Return has been submitted. |
-| APPROVED | Approved | Return has been validated and accepted. |
-| REJECTED | Rejected | Return request was denied. |
-| COMPLETED | Completed | Returned product has been processed back into inventory. |
+| REQUESTED | Requested | El return ha sido solicitado. |
+| APPROVED | Approved | El return ha sido validado y aceptado. |
+| REJECTED | Rejected | La solicitud de return fue rechazada. |
+| COMPLETED | Completed | El producto devuelto ha sido reingresado al inventario. |
 
 ---
 
@@ -257,7 +257,7 @@ DomainCatalog
 
 ## Description
 
-Represents the current status of a refund issued after an approved return.
+Representa el estado actual de un refund emitido tras un return aprobado.
 
 ## Inherits From
 
@@ -267,15 +267,15 @@ DomainCatalog
 
 | Code | Name | Description |
 |------|------|-------------|
-| PENDING | Pending | Refund has been requested but not yet processed. |
-| PROCESSED | Processed | Funds have been returned to the buyer. |
-| REJECTED | Rejected | Refund request was denied. |
+| PENDING | Pending | El refund ha sido solicitado pero aún no procesado. |
+| PROCESSED | Processed | Los fondos han sido devueltos al buyer. |
+| REJECTED | Rejected | La solicitud de refund fue rechazada. |
 
 ---
 
 # Primitive Enumerations
 
-The following concepts are simple enumerations because they represent fixed technical values without business behavior.
+Los siguientes conceptos son enumeraciones simples porque representan valores técnicos fijos sin comportamiento de negocio.
 
 ---
 
@@ -283,7 +283,7 @@ The following concepts are simple enumerations because they represent fixed tech
 
 ### Description
 
-Represents the classification of a delivery address registered by a buyer.
+Representa la clasificación de una dirección de entrega registrada por un buyer.
 
 ### Values
 
@@ -296,7 +296,7 @@ Represents the classification of a delivery address registered by a buyer.
 
 ### Description
 
-Represents the communication channel used by the system to notify participants about order and shipment events.
+Representa el canal de comunicación utilizado por el sistema para notificar eventos de orders y shipments.
 
 ### Values
 
@@ -308,9 +308,9 @@ Represents the communication channel used by the system to notify participants a
 
 # Design Notes
 
-- All business catalogs inherit from **DomainCatalog**.
-- Value Objects are immutable.
-- Equality is determined by their values rather than object identity.
-- Business entities reference Value Objects instead of primitive strings.
-- Primitive Enumerations are reserved exclusively for technical concepts that do not encapsulate business rules or behavior.
-- This approach improves maintainability, consistency, and alignment with Domain-Driven Design (DDD) principles while supporting future domain evolution.
+- Todos los catálogos de negocio heredan de **DomainCatalog**.
+- Los Value Objects son inmutables.
+- La igualdad se determina por sus valores, no por identidad de objeto.
+- Las entidades de negocio referencian Value Objects en lugar de cadenas de texto primitivas.
+- Las Primitive Enumerations se reservan exclusivamente para conceptos técnicos que no encapsulan reglas o comportamiento de negocio.
+- Este enfoque mejora el mantenimiento, la consistencia y la alineación con los principios de Domain-Driven Design (DDD), facilitando la evolución futura del dominio.
