@@ -17,6 +17,7 @@ DomainCatalog (Abstract)
 ├── BuyerStatus
 ├── ProductType
 ├── ProductStatus
+├── WarehouseOwnerType
 ├── MovementType
 ├── OrderStatus
 ├── InvoiceStatus
@@ -144,6 +145,25 @@ DomainCatalog
 | PUBLISHED | Published | El producto es visible en el catálogo público. |
 | SUSPENDED | Suspended | El producto está temporalmente oculto del catálogo. |
 | DISCONTINUED | Discontinued | El producto se retira de forma permanente de la venta. |
+
+---
+
+# WarehouseOwnerType
+
+## Description
+
+Representa quién administra una warehouse: el propio Marketplace o un seller. Reemplaza la necesidad de subclases separadas de Warehouse, ya que la distinción no implica atributos ni comportamiento adicionales, solo un dato de propiedad.
+
+## Inherits From
+
+DomainCatalog
+
+## Allowed Values
+
+| Code | Name | Description |
+|------|------|-------------|
+| MARKETPLACE | Marketplace | La warehouse pertenece y es operada directamente por el Marketplace. |
+| SELLER | Seller | La warehouse pertenece y es operada por un seller. |
 
 ---
 

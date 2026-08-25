@@ -22,9 +22,7 @@ Product (Abstract)
 ├── PhysicalProduct
 └── DigitalProduct
 
-Warehouse (Abstract)
-├── MarketplaceWarehouse
-└── SellerWarehouse
+Warehouse
 
 Inventory
 Cart
@@ -189,15 +187,13 @@ Representa un producto intangible que se entrega inmediatamente tras la confirma
 
 ---
 
-# Warehouse (Abstract)
+# Warehouse
 
 ## Description
 
 Representa una ubicación física donde se almacena y gestiona el inventario.
 
-Las warehouses se clasifican según quién las administra: el propio Marketplace o un seller.
-
-Esta clase no puede instanciarse directamente.
+Una warehouse puede pertenecer directamente al Marketplace o a un seller; esta distinción no cambia su comportamiento ni sus reglas de negocio, por lo que se modela como un atributo (`ownerType`) en lugar de como subclases separadas.
 
 ## Attributes
 
@@ -205,35 +201,9 @@ Esta clase no puede instanciarse directamente.
 |-----------|------|-------------|
 | identifier | String | Identifica de forma única a la warehouse. |
 | location | String | Ubicación física de la warehouse. |
-| responsibleUser | User | Usuario responsable de la operación de la warehouse. |
-
----
-
-# MarketplaceWarehouse
-
-## Description
-
-Representa una bodega propiedad del Marketplace y operada directamente por este.
-
-## Attributes
-
-| Attribute | Type | Description |
-|-----------|------|-------------|
-| assignedOperator | LogisticsOperator | Operador logístico responsable de la operación diaria. |
-
----
-
-# SellerWarehouse
-
-## Description
-
-Representa una bodega propiedad de un seller y operada por este.
-
-## Attributes
-
-| Attribute | Type | Description |
-|-----------|------|-------------|
-| ownerSeller | Seller | Seller propietario y operador de la warehouse. |
+| ownerType | WarehouseOwnerType | Indica si la warehouse pertenece al Marketplace o a un seller. |
+| owner | User | Admin (si es del Marketplace) o Seller (si es propia del vendedor) dueño de la warehouse. |
+| responsibleUser | User | Usuario responsable de la operación diaria de la warehouse. |
 
 ---
 
