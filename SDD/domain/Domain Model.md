@@ -138,7 +138,6 @@ Representa un producto tangible que requiere control de inventario y despacho f�
 | Attribute | Type | Description |
 |-----------|------|-------------|
 | associatedInventory | Inventory | Registro de stock que vincula el producto con una warehouse. |
-| requiresShipment | Boolean | Indica que el producto debe pasar por el flujo logístico. |
 
 ---
 
@@ -152,7 +151,6 @@ Representa un producto intangible que se entrega inmediatamente tras la confirma
 
 | Attribute | Type | Description |
 |-----------|------|-------------|
-| immediateDelivery | Boolean | Confirma que el producto se entrega justo después del pago. |
 | digitalAsset | String | Referencia al recurso digital entregado al buyer. |
 
 ---
@@ -169,10 +167,9 @@ Una warehouse puede pertenecer directamente al Marketplace o a un seller; esta d
 
 | Attribute | Type | Description |
 |-----------|------|-------------|
-| identifier | String | Identifica de forma única a la warehouse. |
+| identifier | long | Identifica de forma única a la warehouse. |
 | location | String | Ubicación física de la warehouse. |
 | ownerType | WarehouseOwnerType | Indica si la warehouse pertenece al Marketplace o a un seller. |
-| owner | User | Admin (si es del Marketplace) o Seller (si es propia del vendedor) dueño de la warehouse. |
 | responsibleUser | User | Usuario responsable de la operación diaria de la warehouse. |
 
 ---
@@ -207,7 +204,6 @@ Representa la selección provisional de productos realizada por un buyer antes d
 |-----------|------|-------------|
 | buyer | Buyer | Propietario del cart. |
 | items | List\<Product\> | Productos seleccionados provisionalmente. |
-| creationDate | LocalDateTime | Fecha y hora de creación del cart. |
 
 ---
 
@@ -258,7 +254,7 @@ Representa el proceso logístico —empaque, despacho y transporte— aplicado a
 |-----------|------|-------------|
 | order | Order | Order que está siendo enviado. |
 | originWarehouse | Warehouse | Bodega desde la cual parte el envío. |
-| operator | LogisticsOperator | Operador responsable del despacho. |
+| dispatchManager | User | Persona responsable del despacho. |
 | shipmentStatus | ShipmentStatus | Estado actual del envío. |
 | dispatchDate | LocalDateTime | Fecha y hora en que el envío salió de la warehouse. |
 
