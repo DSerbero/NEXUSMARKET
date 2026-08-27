@@ -138,7 +138,6 @@ Representa un producto tangible que requiere control de inventario y despacho f�
 | Attribute | Type | Description |
 |-----------|------|-------------|
 | associatedInventory | Inventory | Registro de stock que vincula el producto con una warehouse. |
-| requiresShipment | Boolean | Indica que el producto debe pasar por el flujo logístico. |
 
 ---
 
@@ -152,7 +151,6 @@ Representa un producto intangible que se entrega inmediatamente tras la confirma
 
 | Attribute | Type | Description |
 |-----------|------|-------------|
-| immediateDelivery | Boolean | Confirma que el producto se entrega justo después del pago. |
 | digitalAsset | String | Referencia al recurso digital entregado al buyer. |
 
 ---
