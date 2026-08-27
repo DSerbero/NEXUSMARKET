@@ -204,7 +204,6 @@ Representa la selección provisional de productos realizada por un buyer antes d
 |-----------|------|-------------|
 | buyer | Buyer | Propietario del cart. |
 | items | List\<Product\> | Productos seleccionados provisionalmente. |
-| creationDate | LocalDateTime | Fecha y hora de creación del cart. |
 
 ---
 
