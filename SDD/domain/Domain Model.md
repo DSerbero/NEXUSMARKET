@@ -14,9 +14,7 @@ El modelo sigue principios de Diseño Orientado a Objetos y aplica herencia para
 User (Abstract)
 ├── Buyer
 ├── Seller
-├── LogisticsOperator
-├── Admin
-└── Supervisor
+└── LogisticsOperator
 
 Product (Abstract)
 ├── PhysicalProduct
