@@ -1,5 +1,8 @@
 package app.domain.models;
 
-public class DigitalProduct {
-    
+import lombok.Getter;
+
+@Getter
+public class DigitalProduct extends Product {
+    private String digitalAsset;
 }

@@ -1,5 +1,6 @@
 package app.domain.models;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import lombok.Getter;

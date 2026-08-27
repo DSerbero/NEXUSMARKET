@@ -10,7 +10,7 @@ import app.domain.valueObjects.UserStatus;
 @Getter
 @Setter
 @NoArgsConstructor
-public abstract class User {
+public class User {
     private long identifier;
     private String fullName;
     private String email;
