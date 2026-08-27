@@ -170,7 +170,6 @@ Una warehouse puede pertenecer directamente al Marketplace o a un seller; esta d
 | identifier | long | Identifica de forma única a la warehouse. |
 | location | String | Ubicación física de la warehouse. |
 | ownerType | WarehouseOwnerType | Indica si la warehouse pertenece al Marketplace o a un seller. |
-| owner | User | Admin (si es del Marketplace) o Seller (si es propia del vendedor) dueño de la warehouse. |
 | responsibleUser | User | Usuario responsable de la operación diaria de la warehouse. |
 
 ---
