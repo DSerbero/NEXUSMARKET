@@ -11,7 +11,7 @@ El modelo sigue principios de Diseño Orientado a Objetos y aplica herencia para
 # Domain Class Hierarchy
 
 ```text
-User (Abstract)
+User
 ├── Buyer
 ├── Seller
 └── LogisticsOperator
@@ -37,15 +37,15 @@ Refund
 
 ---
 
-# User (Abstract)
+# User
 
 ## Description
 
-Representa a cualquier persona autorizada para interactuar con el sistema NexusMarket. Esta clase abstracta centraliza la información de identificación y acceso común a todos los roles de la plataforma (Buyer, Seller, LogisticsOperator, Admin, Supervisor).
+Representa a cualquier persona autorizada para interactuar con el sistema NexusMarket. Centraliza la información de identificación y acceso común a todos los roles de la plataforma.
 
 Cada usuario tiene exactamente un rol y solo puede gestionar información dentro del alcance de ese rol (reglas de negocio RG-02, RG-03).
 
-Esta clase no puede instanciarse directamente.
+Los roles `ADMIN` y `SUPERVISOR` no tienen atributos adicionales más allá de los definidos aquí, por lo que se representan como instancias directas de `User` (identificadas por su `role`), sin una subclase propia. `Buyer`, `Seller` y `LogisticsOperator` sí requieren subclase porque agregan atributos y relaciones que no aplican al resto de los usuarios.
 
 ## Attributes
 
@@ -105,34 +105,6 @@ Representa a la parte encargada de la operación física de las bodegas y del de
 | Attribute | Type | Description |
 |-----------|------|-------------|
 | assignedWarehouse | Warehouse | Bodega bajo responsabilidad del operator. |
-
----
-
-# Admin
-
-## Description
-
-Representa al administrador responsable de gestionar sellers y warehouses en todo el Marketplace.
-
-## Attributes
-
-| Attribute | Type | Description |
-|-----------|------|-------------|
-| administrativePermissions | List\<String\> | Capacidades administrativas otorgadas a la cuenta. |
-
----
-
-# Supervisor
-
-## Description
-
-Representa un perfil de solo lectura utilizado para consulta y seguimiento operativo en todo el sistema.
-
-## Attributes
-
-| Attribute | Type | Description |
-|-----------|------|-------------|
-| consultationScope | String | Alcance de información que el supervisor está autorizado a ver. |
 
 ---
 
