@@ -203,7 +203,6 @@ DomainCatalog
 
 | Code | Name | Description |
 |------|------|-------------|
-| CART | Cart | Selección provisional de productos. |
 | PENDING_PAYMENT | Pending Payment | En espera de confirmación financiera. |
 | PAID | Paid | Pago confirmado; inicia la preparación. |
 | DISPATCHED | Dispatched | El order ha salido físicamente de la warehouse. |
