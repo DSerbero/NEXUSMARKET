@@ -180,6 +180,7 @@ Cuando se requiere validar que el `seller` suministrado corresponde a un `Seller
 # 9. Product Validation
 
 * `seller` existe y está `ACTIVE`.
+* `price` es mayor que cero.
 * `variants` es una lista válida (puede estar vacía si el producto no tiene variantes).
 * Para `PhysicalProduct`: no se exige `associatedInventory` en el momento del registro — el inventario se crea por separado en el subdominio Inventory Management (Dominio 6: "el inventario debe estar vinculado obligatoriamente a un producto y una bodega específica", como paso posterior al registro del producto).
 * Para `DigitalProduct`: `digitalAsset` no está vacío.
@@ -411,6 +412,7 @@ Un producto `DISCONTINUED` no debe poder agregarse a un `Cart` nuevo (`Cart Mana
 ```text
 ProductNotFoundException
 InvalidProductDataException
+InvalidProductPriceException
 UnauthorizedProductOperationException
 InvalidProductStatusTransitionException
 ProductAlreadyDiscontinuedException
