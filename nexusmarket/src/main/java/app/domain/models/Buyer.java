@@ -11,7 +11,7 @@ import java.util.List;
 @NoArgsConstructor
 public class Buyer extends User {
     private String primaryAddress;
-    private List<String> additionalAddress = new ArrayList<>();
+    private List<String> additionalAddresses = new ArrayList<>();
     private BuyerStatus buyerStatus;
 
 }

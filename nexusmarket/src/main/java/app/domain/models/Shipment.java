@@ -11,7 +11,7 @@ import lombok.Setter;
 public class Shipment {
     private Order order;
     private Warehouse originWarehouse;
-    private User disapatchManager;
+    private User operator;
     private ShipmentStatus shipmentStatus;
     private LocalDateTime dispatchDate;
 }

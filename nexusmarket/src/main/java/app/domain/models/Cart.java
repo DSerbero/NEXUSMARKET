@@ -1,5 +1,6 @@
 package app.domain.models;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -11,4 +12,5 @@ import lombok.Setter;
 public class Cart {
     private Buyer buyer;
     private List<Product> items = new ArrayList<>();
+    private LocalDateTime creationDate;
 }

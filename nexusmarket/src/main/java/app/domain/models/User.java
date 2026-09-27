@@ -11,7 +11,7 @@ import app.domain.valueObjects.UserStatus;
 @Setter
 @NoArgsConstructor
 public class User {
-    private long identifier;
+    private String identifier;
     private String fullName;
     private String email;
     private UserRole role;

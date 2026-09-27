@@ -11,6 +11,6 @@ import lombok.Setter;
 @Getter
 @NoArgsConstructor
 public class Seller extends User {
-    private List<Warehouse> associatedWarehouse = new ArrayList<>();
+    private List<Warehouse> associatedWarehouses = new ArrayList<>();
     private List<Product> productCatalog = new ArrayList<>();
 }

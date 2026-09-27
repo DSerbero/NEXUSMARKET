@@ -2,7 +2,7 @@ package app.domain.valueObjects;
 
 public final class InvoiceStatus extends DomainCatalog {
     
-    public static final InvoiceStatus ENABLED = new InvoiceStatus(
+    public static final InvoiceStatus ISSUED = new InvoiceStatus(
         "ISSUED", "Issued", "The invoice has been generated.");
     public static final InvoiceStatus PAID = new InvoiceStatus(
         "PAID", "Paid", "The invoice amount has been collected.");

@@ -257,7 +257,7 @@ Representa el proceso logístico —empaque, despacho y transporte— aplicado a
 |-----------|------|-------------|
 | order | Order | Order que está siendo enviado. |
 | originWarehouse | Warehouse | Bodega desde la cual parte el envío. |
-| operator | LogisticsOperator | Operador responsable del despacho. |
+| operator | User | Usuario responsable del despacho: `LogisticsOperator` para bodegas del Marketplace o `Seller` para bodegas propias. |
 | shipmentStatus | ShipmentStatus | Estado actual del envío. |
 | dispatchDate | LocalDateTime | Fecha y hora en que el envío salió de la warehouse. |
 

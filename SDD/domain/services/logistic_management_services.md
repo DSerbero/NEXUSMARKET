@@ -19,7 +19,7 @@ Shipment
   |
   +-- order : Order
   +-- originWarehouse : Warehouse
-  +-- operator : LogisticsOperator
+      +-- operator : User
   +-- shipmentStatus : ShipmentStatus
   +-- dispatchDate : LocalDateTime
 ```
@@ -50,7 +50,7 @@ Shipment
   |
   +-- order : Order
   +-- originWarehouse : Warehouse
-  +-- operator : LogisticsOperator
+      +-- operator : User
   +-- shipmentStatus : ShipmentStatus
   +-- dispatchDate : LocalDateTime
 ```
@@ -74,13 +74,18 @@ IN_PREPARATION
 
 ---
 
-# 3. LogisticsOperator and Shipment Relationship
+# 3. Dispatching User and Shipment Relationship
 
 ```text
-Shipment.operator : LogisticsOperator
+Shipment.operator : User
 ```
 
-Solo el `LogisticsOperator` asignado como `operator` del `Shipment` (que a su vez debe corresponder al `responsibleUser` de `originWarehouse`, ver Warehouse Management Services) puede actualizar su estado. `ADMIN` puede operar sin restricción; `SUPERVISOR` solo lectura; el `Buyer` dueño del `Order` solo puede consultar, nunca modificar.
+El usuario que opera el `Shipment` depende del tipo de propietario de la bodega de origen:
+
+* `MARKETPLACE`: el `operator` debe ser el `LogisticsOperator` asignado como `responsibleUser`.
+* `SELLER`: el `operator` debe ser el `Seller` propietario de la bodega, que también es su `responsibleUser`.
+
+El usuario responsable puede actualizar el estado del `Shipment`. `ADMIN` puede operar sin restricción; `SUPERVISOR` solo lectura; el `Buyer` dueño del `Order` solo puede consultar, nunca modificar.
 
 ```text
 Shipment.operator == Shipment.originWarehouse.responsibleUser
@@ -105,7 +110,7 @@ Input Domain Models / Value Objects
 Retrieve authoritative Shipment (o Order, para Register Shipment)
                 |
                 v
-Validate requesting User (LogisticsOperator asignado, o Admin)
+Validate requesting User (Seller propietario o LogisticsOperator asignado, o Admin)
                 |
                 v
 Validate status transition
@@ -166,7 +171,7 @@ El servicio nunca debe confiar en `shipmentStatus` suministrado por el caller pa
 
 # 8. External Information
 
-* `WarehouseRepositoryPort` — para validar que `operator == originWarehouse.responsibleUser`.
+* `WarehouseRepositoryPort` — para validar que `operator == originWarehouse.responsibleUser` y que el usuario permitido corresponde al `ownerType` de la bodega.
 * `OrderRepositoryPort` — para validar que `order.orderStatus == DISPATCHED` al registrar el shipment.
 
 Los servicios de aplicación nunca deben acceder directamente a la base de datos.
@@ -178,7 +183,8 @@ Los servicios de aplicación nunca deben acceder directamente a la base de datos
 * `order` existe y `order.orderStatus == DISPATCHED` al momento de registrar el shipment.
 * `order` contiene al menos un `PhysicalProduct` (un order 100% digital nunca debe llegar a este subdominio, ver §1).
 * `originWarehouse` existe.
-* `operator.role == LOGISTICS_OPERATOR` y `operator == originWarehouse.responsibleUser`.
+* Si `originWarehouse.ownerType == MARKETPLACE`, `operator.role == LOGISTICS_OPERATOR` y `operator == originWarehouse.responsibleUser`.
+* Si `originWarehouse.ownerType == SELLER`, `operator.role == SELLER`, `operator == originWarehouse.owner` y `operator == originWarehouse.responsibleUser`.
 * No existe ya un `Shipment` para ese `Order` (uno a uno).
 
 ---
@@ -298,6 +304,7 @@ Actualiza el estado de un `Shipment` a medida que avanza por las etapas de prepa
 ## 15.2 Required Validations
 
 * `requestingUser == Shipment.operator` o `requestingUser.role == ADMIN`.
+* El `Shipment.operator` debe ser el `Seller` propietario de una bodega `SELLER` o el `LogisticsOperator` responsable de una bodega `MARKETPLACE`.
 * `Shipment` existe.
 * Transición de `shipmentStatus` válida, estrictamente secuencial (§2.2).
 

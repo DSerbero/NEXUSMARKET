@@ -12,5 +12,6 @@ public class Warehouse {
     private long identifier;
     private String location;
     private WarehouseOwnerType ownerType;
+    private User owner;
     private User responsibleUser;
 }
