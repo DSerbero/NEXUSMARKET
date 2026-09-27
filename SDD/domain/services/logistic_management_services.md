@@ -19,7 +19,7 @@ Shipment
   |
   +-- order : Order
   +-- originWarehouse : Warehouse
-      +-- operator : User
+  +-- operator : User
   +-- shipmentStatus : ShipmentStatus
   +-- dispatchDate : LocalDateTime
 ```
