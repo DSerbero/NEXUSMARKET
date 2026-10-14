@@ -24,6 +24,7 @@ import app.domain.ports.out.CartRepositoryPort;
 import app.domain.ports.out.OrderRepositoryPort;
 import app.domain.ports.out.ProductRepositoryPort;
 import app.domain.services.cart.CartService;
+import app.domain.services.checkout.CheckoutService;
 import app.domain.valueobjects.BuyerStatus;
 import app.domain.valueobjects.ProductStatus;
 import app.domain.valueobjects.UserRole;
@@ -51,7 +52,7 @@ class CheckoutPersistenceIntegrationTest {
     private CartService cartService;
 
     @Autowired
-    private OrderService orderService;
+    private CheckoutService checkoutService;
 
     @MockitoBean
     private ProductRepositoryPort productRepository;
@@ -83,7 +84,7 @@ class CheckoutPersistenceIntegrationTest {
         Cart storedCart = cartRepository.findByBuyer(cartQuery).orElseThrow();
         assertEquals(2, storedCart.getItems().get(0).getQuantity());
 
-        Order confirmed = orderService.confirmCart(buyer);
+        Order confirmed = checkoutService.confirmCart(buyer);
         Order orderQuery = new Order();
         orderQuery.setIdentifier(confirmed.getIdentifier());
         Order storedOrder = orderRepository.findByIdentifier(orderQuery).orElseThrow();

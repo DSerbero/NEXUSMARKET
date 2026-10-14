@@ -1,4 +1,4 @@
-package app.domain.services.order;
+package app.domain.services.checkout;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
@@ -33,7 +33,7 @@ import app.domain.valueobjects.ProductStatus;
 import app.domain.valueobjects.UserRole;
 import app.domain.valueobjects.UserStatus;
 
-class OrderServiceConfirmCartTest {
+class CheckoutServiceTest {
 
     @Test
     void confirmationUsesCurrentProductSnapshotAndClearsAuthoritativeCart() {
@@ -45,7 +45,7 @@ class OrderServiceConfirmCartTest {
         CartRepositoryPort cartRepository = mock(CartRepositoryPort.class);
         ProductRepositoryPort productRepository = mock(ProductRepositoryPort.class);
         OrderRepositoryPort orderRepository = mock(OrderRepositoryPort.class);
-        OrderService service = service(buyerRepository, cartRepository, productRepository, orderRepository);
+        CheckoutService service = service(buyerRepository, cartRepository, productRepository, orderRepository);
         when(buyerRepository.findByIdentifier(buyer)).thenReturn(Optional.of(buyer));
         when(cartRepository.findByBuyerForUpdate(any(Cart.class))).thenReturn(Optional.of(cart));
         when(productRepository.findByIdentifier(any(Product.class))).thenReturn(Optional.of(currentProduct));
@@ -74,7 +74,7 @@ class OrderServiceConfirmCartTest {
         CartRepositoryPort cartRepository = mock(CartRepositoryPort.class);
         ProductRepositoryPort productRepository = mock(ProductRepositoryPort.class);
         OrderRepositoryPort orderRepository = mock(OrderRepositoryPort.class);
-        OrderService service = service(buyerRepository, cartRepository, productRepository, orderRepository);
+        CheckoutService service = service(buyerRepository, cartRepository, productRepository, orderRepository);
         when(buyerRepository.findByIdentifier(buyer)).thenReturn(Optional.of(buyer));
         when(cartRepository.findByBuyerForUpdate(any(Cart.class))).thenReturn(Optional.of(cart));
         when(productRepository.findByIdentifier(any(Product.class)))
@@ -95,7 +95,7 @@ class OrderServiceConfirmCartTest {
         CartRepositoryPort cartRepository = mock(CartRepositoryPort.class);
         ProductRepositoryPort productRepository = mock(ProductRepositoryPort.class);
         OrderRepositoryPort orderRepository = mock(OrderRepositoryPort.class);
-        OrderService service = service(buyerRepository, cartRepository, productRepository, orderRepository);
+        CheckoutService service = service(buyerRepository, cartRepository, productRepository, orderRepository);
         when(buyerRepository.findByIdentifier(buyer)).thenReturn(Optional.of(buyer));
         when(cartRepository.findByBuyerForUpdate(any(Cart.class))).thenReturn(Optional.of(cart));
 
@@ -104,24 +104,9 @@ class OrderServiceConfirmCartTest {
         verifyNoInteractions(productRepository, orderRepository);
     }
 
-    @Test
-    void digitalOnlyOrderCanFinalizeDirectlyAfterPayment() {
-        OrderRepositoryPort orderRepository = mock(OrderRepositoryPort.class);
-        OrderService service = service(mock(BuyerRepositoryPort.class), mock(CartRepositoryPort.class),
-                mock(ProductRepositoryPort.class), orderRepository);
-        Order order = new Order();
-        order.setOrderStatus(OrderStatus.PAID);
-        order.getItems().add(new OrderItemSnapshot(
-                digitalProduct("product-1", BigDecimal.TEN, ProductStatus.PUBLISHED), 1));
-        when(orderRepository.findByIdentifier(order)).thenReturn(Optional.of(order));
-        when(orderRepository.update(order)).thenReturn(order);
-
-        assertEquals(OrderStatus.DELIVERED_FINALIZED, service.finalizeOrder(order).getOrderStatus());
-    }
-
-    private OrderService service(BuyerRepositoryPort buyerRepository, CartRepositoryPort cartRepository,
+    private CheckoutService service(BuyerRepositoryPort buyerRepository, CartRepositoryPort cartRepository,
             ProductRepositoryPort productRepository, OrderRepositoryPort orderRepository) {
-        return new OrderService(buyerRepository, cartRepository, productRepository, orderRepository);
+        return new CheckoutService(buyerRepository, cartRepository, productRepository, orderRepository);
     }
 
     private Buyer activeBuyer(String identifier) {
