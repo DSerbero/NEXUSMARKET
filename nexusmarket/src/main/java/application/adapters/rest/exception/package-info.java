@@ -1,1 +1,0 @@
-package application.adapters.rest.exception;

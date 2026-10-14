@@ -215,7 +215,7 @@ Representa la selección provisional de productos realizada por un buyer antes d
 
 ## Description
 
-Representa el compromiso comercial formal entre un buyer y el Marketplace. Es la entidad central del sistema y avanza a través de un ciclo de vida definido: Cart → Pending Payment → Paid → Dispatched → Delivered/Finalized. Un order finalizado no puede modificarse bajo ninguna circunstancia.
+Representa el compromiso comercial formal entre un buyer y el Marketplace. Es la entidad central del sistema y avanza a través de un ciclo de vida definido: Cart → Pending Payment → Paid → Dispatched → Delivered/Finalized. Un order finalizado no puede modificarse bajo ninguna circunstancia. Sus items son snapshots comerciales aceptados al confirmar el cart, no referencias vivas a los productos del catalogo.
 
 ## Attributes
 
@@ -226,6 +226,8 @@ Representa el compromiso comercial formal entre un buyer y el Marketplace. Es la
 | orderStatus | OrderStatus | Etapa actual del ciclo de vida del order. |
 | creationDate | LocalDateTime | Fecha y hora de creación del order. |
 | completionDate | LocalDateTime | Fecha y hora de finalización del order. |
+
+> **Nota de implementacion:** el modelo Java actual declara `items` como `List<Product>`. Antes de implementar checkout persistente, esa representacion debe conservar de forma inmutable los datos comerciales de cada linea (incluido el precio aceptado); puede hacerse con un `OrderItemSnapshot` o un mapeo equivalente. La asignacion de almacenamiento y consistencia se define en [Persistencia y Consistencia](../Software%20Architecture/Persistence%20and%20Consistency.md).
 
 ---
 

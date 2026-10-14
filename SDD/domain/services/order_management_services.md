@@ -71,9 +71,15 @@ Es un ciclo estrictamente secuencial — no existen transiciones hacia atrás ni
 
 ## 2.3 Order and Cart Relationship
 
-`Order` se crea a partir de un `Cart` confirmado (ver Cart Management Services, §17). `Order.items` se copia del `Cart.items` validado en el momento de la creación — no es una referencia viva al carrito, que ya fue vaciado tras la confirmación.
+`Order` se crea a partir de un `Cart` confirmado (ver Cart Management Services, §17). `Order.items` conserva una instantanea de los productos validada al confirmar el carrito — no es una referencia viva al carrito ni al catalogo Mongo. El cart se vacia en el mismo commit relacional que persiste la orden y sus items.
 
-## 2.4 Order and Other Subdomains
+## 2.4 Order Item Snapshot
+
+Cada linea de `order_items` conserva los valores comerciales que acepto el buyer: identificador y tipo de producto, precio unitario, variantes y seller; para productos digitales conserva la referencia de entrega necesaria. La factura consulta estos valores historicos, no el precio actual de `Product` en MongoDB. Las modificaciones o eliminaciones posteriores del catalogo no reescriben un pedido existente.
+
+`Product` y `Order` viven en almacenes distintos; no existe FK ni transaccion ACID entre MySQL y MongoDB. La confirmacion MySQL es el punto de aceptacion del snapshot. Los requisitos de versionado/cotizacion para resolver cambios concurrentes del catalogo se detallan en [Persistencia y Consistencia](../../Software%20Architecture/Persistence%20and%20Consistency.md).
+
+## 2.5 Order and Other Subdomains
 
 ```text
 Order

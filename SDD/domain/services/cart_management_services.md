@@ -45,7 +45,7 @@ Cart
 
 ## 2.2 One Active Cart per Buyer
 
-La especificación funcional no contempla múltiples carritos simultáneos por buyer. Este documento asume que cada `Buyer` tiene, en todo momento, **un único `Cart` activo**, creado implícitamente en la primera llamada a `Add Product to Cart` si no existe uno ya. Esta es una decisión de diseño que debe confirmarse contra los requisitos reales del proyecto antes de implementarse.
+**Decision:** cada `Buyer` tiene un unico `Cart` activo, creado implicitamente al agregar el primer producto. La persistencia lo garantiza con una restriccion unica por `buyer_identifier` en MySQL. Esta decision coincide con `CartService.findByBuyer`; un carrito historico no se conserva como otro carrito activo.
 
 ## 2.3 Cart and Order Relationship
 
@@ -193,6 +193,8 @@ ProductRepositoryPort
 ```
 
 Adicionalmente, `Confirm Cart` coordina con el Input Port `CreateOrderUseCase` del subdominio Order Management (ver §17) — no accede directamente a `OrderRepositoryPort`.
+
+`Confirm Cart` debe coordinar la creacion del order y el vaciado del cart en una sola transaccion MySQL. La lectura y validacion de productos en MongoDB queda fuera de esa transaccion y los datos aceptados se copian como snapshot al order. Ver [Persistencia y Consistencia](../../Software%20Architecture/Persistence%20and%20Consistency.md).
 
 ## Service-to-Port Matrix
 

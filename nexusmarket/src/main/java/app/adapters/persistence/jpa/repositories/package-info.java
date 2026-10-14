@@ -1,0 +1,1 @@
+package app.adapters.persistence.jpa.repositories;

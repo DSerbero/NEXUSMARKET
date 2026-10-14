@@ -1,0 +1,1 @@
+package app.adapters.persistence.mongodb.documents;

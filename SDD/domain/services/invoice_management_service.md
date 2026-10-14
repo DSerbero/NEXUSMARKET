@@ -67,7 +67,7 @@ VOIDED
 
 ## 2.3 totalAmount Is Derived, Not Supplied
 
-`Invoice.totalAmount` no es un valor que el caller decida; se calcula a partir de `Order.items` en el momento de la emisión. Aceptar un `totalAmount` arbitrario del caller sería un riesgo de integridad financiera — el mismo tipo de error que ya evitamos en Inventory Management al no confiar en `availableQuantity` suministrado externamente.
+`Invoice.totalAmount` no es un valor que el caller decida; se calcula a partir de los precios guardados en el snapshot inmutable de `Order.items`, no consultando el precio actual del catalogo MongoDB. Aceptar un `totalAmount` arbitrario del caller sería un riesgo de integridad financiera — el mismo tipo de error que ya evitamos en Inventory Management al no confiar en `availableQuantity` suministrado externamente. Ver [Persistencia y Consistencia](../../Software%20Architecture/Persistence%20and%20Consistency.md).
 
 ---
 

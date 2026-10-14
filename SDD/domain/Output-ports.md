@@ -12,6 +12,8 @@ Todos los puertos:
 * Son implementados por adaptadores de persistencia — el dominio nunca depende de JPA, SQL, MongoDB, ni ningún detalle de infraestructura.
 * Viven en el paquete de dominio/aplicación; sus implementaciones viven en la capa de adaptadores.
 
+La asignacion normativa de cada agregado a MySQL o MongoDB, junto con transacciones y referencias entre almacenes, se define en [Persistencia y Consistencia](../Software%20Architecture/Persistence%20and%20Consistency.md). Este catalogo define contratos; no crea una transaccion distribuida entre adaptadores.
+
 ```text
 Application Service
         |

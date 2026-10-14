@@ -24,39 +24,56 @@ Las dependencias apuntan hacia el dominio. Los modelos del dominio no dependen d
 
 ## Mapeo de paquetes
 
-El paquete Java raiz es `application`, dentro del modulo existente `nexusmarket`.
+El paquete Java raiz es `app`, dentro del modulo existente `nexusmarket`.
 
 | Paquete | Responsabilidad |
 |---|---|
-| `application.domain.models` | User, Buyer, Seller, Product, Inventory, Cart, Order, Invoice, Shipment, Return, Refund y Warehouse. |
-| `application.domain.enums` / `valueobjects` | Tipos controlados y catalogos del dominio. |
-| `application.domain.exceptions` | Excepciones de validacion/reglas de negocio. |
-| `application.domain.ports.in` | Contratos de entrada que exponen casos de uso. |
-| `application.domain.ports.out` | Contratos de persistencia y servicios externos; implementados por adaptadores. |
-| `application.domain.services` | Comportamiento de dominio reutilizable, independiente de infraestructura. |
-| `application.adapters.useCases` | Servicios de aplicacion que coordinan validacion, dominio y output ports, agrupados por subdominio. |
-| `application.adapters.rest` | Controladores, DTOs, mappers y manejo de errores HTTP. |
-| `application.adapters.persistence.jpa` | Entidades, mappers y repositorios para persistencia relacional. |
-| `application.adapters.persistence.mongodb` | Documentos, mappers y repositorios para persistencia documental. |
-| `application.infrastructure` | Configuracion Spring, seguridad y notificaciones. |
+| `app.domain.models` | User, Buyer, Seller, Product, Inventory, Cart, Order, Invoice, Shipment, Return, Refund y Warehouse. |
+| `app.domain.enums` / `valueobjects` | Tipos controlados y catalogos del dominio. |
+| `app.domain.exceptions` | Excepciones de validacion/reglas de negocio. |
+| `app.domain.ports.in` | Contratos de entrada que exponen casos de uso, agrupados por actor cuando corresponda. |
+| `app.domain.ports.out` | Contratos de persistencia y servicios externos; implementados por adaptadores. |
+| `app.domain.services` | Servicios de negocio organizados por subdominio; aplican reglas y usan output ports, nunca adaptadores concretos. |
+| `app.adapters.useCases` | Adaptadores de entrada por actor/rol; implementan input ports y delegan en servicios de dominio. |
+| `app.adapters.rest` | Controladores, DTOs, mappers y manejo de errores HTTP; los controladores invocan input ports. |
+| `app.adapters.persistence.jpa` | Entidades, mappers y repositorios para persistencia relacional. |
+| `app.adapters.persistence.mongodb` | Documentos, mappers y repositorios para persistencia documental. |
+| `app.infrastructure` | Configuracion Spring, seguridad y notificaciones. |
 
 Los nombres de subdominio deben reflejar NexusMarket: `user`, `authorization`, `buyer`, `seller`, `warehouse`, `product`, `inventory`, `cart`, `order`, `invoice`, `logistics`, `returns` y `reporting`. No se deben crear paquetes bancarios como `account` o `loan` para este proyecto.
 
 ## Estado observado
 
-El codigo existente fue reubicado bajo `src/main/java/application`. Los modelos, catalogos, excepciones, output ports y servicios de aplicacion existentes ya tienen su paquete correspondiente. La carpeta `application.adapters.useCases` contiene esos servicios.
+El codigo existente usa `src/main/java/app`. Los servicios de dominio se organizan por subdominio en `app.domain.services`; `DomainValidations` contiene validaciones reutilizables y las clases de cada subdominio implementan operaciones de negocio mediante output ports.
 
-Todavia no hay implementaciones de puertos de persistencia JPA/MongoDB, entidades/documentos, controladores REST, DTOs, puertos de entrada ni adaptadores concretos de seguridad/notificacion. Sus dependencias Maven no equivalen a implementaciones. Esas capas deben agregarse al definir contratos de API y asignacion de cada agregado a SQL o MongoDB; no se deben inventar para hacer que la estructura parezca completa.
+El flujo expuesto actualmente es `ProductController -> PublicAccessPort -> PublicAccessUseCaseImpl -> ProductService`. El adaptador `PublicAccessUseCaseImpl` se mantiene delgado y no contiene reglas de producto. Los demas servicios ya pueden probarse de forma aislada, pero sus input ports y adaptadores por rol se agregaran cuando se expongan sus contratos de API; no se deben inventar endpoints para completar el arbol.
+
+La capa REST ya contiene `ProductController`, y MongoDB tiene un adaptador concreto para productos. Aun faltan los adaptadores JPA y las implementaciones de persistencia para los demas agregados. Las dependencias Maven por si solas no equivalen a esas implementaciones.
+
+La asignacion de `User`, `Buyer`, `Cart` y `Order` a MySQL, la permanencia de `Product` en MongoDB y las reglas de consistencia estan definidas en [Persistencia y Consistencia](Persistence%20and%20Consistency.md). Esa decision es normativa para los proximos adaptadores; no significa que ya esten implementados.
+
+## Correspondencia con el proyecto bancario
+
+Se conserva la separacion de responsabilidades usada en el proyecto bancario:
+
+| Capa | NexusMarket | Responsabilidad |
+|---|---|---|
+| Servicios | `app.domain.services.<subdomain>` | Ejecutan una capacidad de negocio y dependen de modelos y output ports. |
+| Puertos de entrada | `app.domain.ports.in` | Definen las operaciones disponibles para cada actor/rol. |
+| Adaptadores de casos de uso | `app.adapters.useCases` | Implementan los puertos de entrada y delegan en servicios; no duplican reglas. |
+
+Los servicios se agrupan por subdominio de Marketplace, no por conceptos bancarios. Las operaciones de devolucion y reembolso permanecen en servicios separados porque tienen ciclos y responsabilidades diferentes.
 
 ## Reglas de dependencia
 
-1. El dominio solo importa Java y otros tipos del dominio.
+1. Los modelos, value objects y excepciones no dependen de frameworks ni adaptadores. Los servicios dependen de modelos y contratos de puertos, no de infraestructura concreta.
 2. Los output ports reciben/devuelven modelos del dominio, nunca entidades JPA, documentos MongoDB o DTOs.
 3. Los adapters implementan los puertos; los servicios no consultan bases de datos directamente.
-4. Los controllers validan formato/transporte y delegan; no aplican reglas de autorizacion ni mutan modelos.
-5. Autenticacion verifica credenciales y produce una identidad; autorizacion valida rol, estado y propiedad del objeto de dominio.
-6. `SUPERVISOR` tiene acceso de lectura, no de escritura.
+4. Los adaptadores de casos de uso implementan input ports y delegan; no duplican reglas de negocio.
+5. Los controllers validan formato/transporte e invocan input ports; no aplican reglas de autorizacion ni mutan modelos.
+6. Autenticacion verifica credenciales y produce una identidad; autorizacion valida rol, estado y propiedad del objeto de dominio.
+7. `SUPERVISOR` tiene acceso de lectura, no de escritura.
 
 ## Decisiones de negocio pendientes en el SDD
 
-Estos puntos aparecen como supuestos en los documentos, no como reglas confirmadas: un solo carrito activo por buyer; posibilidad de volver a solicitar una devolucion rechazada; reembolsos siempre totales frente a parciales; y alcance de los operadores logisticos al aprobar/completar devoluciones. Deben confirmarse antes de implementar persistencia o workflows completos.
+Estos puntos siguen abiertos en los documentos: posibilidad de volver a solicitar una devolucion rechazada; reembolsos siempre totales frente a parciales; alcance de los operadores logisticos al aprobar/completar devoluciones; moneda del marketplace; y si los items de carrito/pedido requieren cantidad explicita. La regla de un solo carrito activo por buyer ya se decidio y se refleja en la persistencia relacional.
