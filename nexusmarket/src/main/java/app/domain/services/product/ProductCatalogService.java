@@ -1,33 +1,37 @@
 package app.domain.services.product;
 
-import app.domain.services.DomainValidations;
-import app.domain.services.authorization.ValidateActiveUserService;
-import app.domain.services.authorization.ValidateOwnershipService;
-import app.domain.services.authorization.ValidateRoleService;
-
 import java.math.BigDecimal;
 import java.util.ArrayList;
 
 import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
 import org.springframework.stereotype.Service;
 
+import app.domain.exceptions.DomainValidationException;
 import app.domain.models.DigitalProduct;
 import app.domain.models.Product;
 import app.domain.models.Seller;
 import app.domain.models.User;
-import app.domain.exceptions.DomainValidationException;
-import app.domain.exceptions.EntityNotFoundException;
 import app.domain.ports.out.ProductRepositoryPort;
+import app.domain.services.DomainValidations;
+import app.domain.services.authorization.ValidateActiveUserService;
+import app.domain.services.authorization.ValidateOwnershipService;
+import app.domain.services.authorization.ValidateRoleService;
 import app.domain.valueobjects.ProductStatus;
 import app.domain.valueobjects.UserRole;
 import lombok.RequiredArgsConstructor;
 
+/**
+ * Catalog operations over products: registration, consultation and update of
+ * commercial data. Status transitions are a different reason to change and
+ * live in {@link ProductLifecycleService} (SRP).
+ */
 @Service
 @ConditionalOnBean(ProductRepositoryPort.class)
 @RequiredArgsConstructor
-public class ProductService {
+public class ProductCatalogService {
 
     private final ProductRepositoryPort productRepository;
+    private final ProductQueryService productQuery;
     private final ValidateActiveUserService validateActiveUser;
     private final ValidateRoleService validateRole;
     private final ValidateOwnershipService validateOwnership;
@@ -44,7 +48,7 @@ public class ProductService {
 
     public Product consult(User requestingUser, Product product) {
         validateActiveUser.execute(requestingUser);
-        Product current = authoritative(product);
+        Product current = productQuery.authoritative(product);
         boolean publicProduct = ProductStatus.PUBLISHED.equals(current.getStatus());
         boolean privilegedReader = UserRole.ADMIN.equals(requestingUser.getRole())
                 || UserRole.SUPERVISOR.equals(requestingUser.getRole());
@@ -56,7 +60,7 @@ public class ProductService {
     }
 
     public Product consultPublished(Product product) {
-        Product current = authoritative(product);
+        Product current = productQuery.authoritative(product);
         if (!ProductStatus.PUBLISHED.equals(current.getStatus())) {
             throw new DomainValidationException("Product not found");
         }
@@ -66,7 +70,7 @@ public class ProductService {
     public Product update(Seller seller, Product product) {
         validateActiveUser.execute(seller);
         validateRole.execute(seller, UserRole.SELLER);
-        Product current = authoritative(product);
+        Product current = productQuery.authoritative(product);
         validateOwnership.execute(seller, current.getSeller());
         if (ProductStatus.DISCONTINUED.equals(current.getStatus())) {
             throw new DomainValidationException("Discontinued product cannot be updated");
@@ -82,45 +86,6 @@ public class ProductService {
             currentDigital.setDigitalAsset(updatedDigital.getDigitalAsset());
         }
         return productRepository.update(current);
-    }
-
-    public Product publish(Seller seller, Product product) {
-        return updateStatus(seller, product, ProductStatus.SUSPENDED, ProductStatus.PUBLISHED);
-    }
-
-    public Product suspend(Seller seller, Product product) {
-        return updateStatus(seller, product, ProductStatus.PUBLISHED, ProductStatus.SUSPENDED);
-    }
-
-    public Product discontinue(Seller seller, Product product) {
-        validateActiveUser.execute(seller);
-        validateRole.execute(seller, UserRole.SELLER);
-        Product current = authoritative(product);
-        validateOwnership.execute(seller, current.getSeller());
-        if (!ProductStatus.PUBLISHED.equals(current.getStatus())
-                && !ProductStatus.SUSPENDED.equals(current.getStatus())) {
-            throw new DomainValidationException("Product cannot be discontinued from its current status");
-        }
-        current.setStatus(ProductStatus.DISCONTINUED);
-        return productRepository.update(current);
-    }
-
-    private Product updateStatus(Seller seller, Product product, ProductStatus expected, ProductStatus next) {
-        validateActiveUser.execute(seller);
-        validateRole.execute(seller, UserRole.SELLER);
-        Product current = authoritative(product);
-        validateOwnership.execute(seller, current.getSeller());
-        if (!expected.equals(current.getStatus())) {
-            throw new DomainValidationException("Invalid product status transition");
-        }
-        current.setStatus(next);
-        return productRepository.update(current);
-    }
-
-    private Product authoritative(Product product) {
-        DomainValidations.required(product, "product");
-        return productRepository.findByIdentifier(product)
-                .orElseThrow(() -> new EntityNotFoundException("Product"));
     }
 
     private void validateProduct(Product product) {

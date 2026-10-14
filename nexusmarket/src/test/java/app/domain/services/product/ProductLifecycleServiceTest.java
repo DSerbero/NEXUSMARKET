@@ -20,12 +20,12 @@ import app.domain.valueobjects.ProductStatus;
 import app.domain.valueobjects.UserRole;
 import app.domain.valueobjects.UserStatus;
 
-class ProductServiceBusinessRulesTest {
+class ProductLifecycleServiceTest {
 
     @Test
     void publishingAlreadyPublishedProductIsRejected() {
         ProductRepositoryPort repository = mock(ProductRepositoryPort.class);
-        ProductService service = service(repository);
+        ProductLifecycleService service = lifecycleService(repository);
         Seller seller = activeSeller();
         DigitalProduct product = product(seller, ProductStatus.PUBLISHED);
         when(repository.findByIdentifier(product)).thenReturn(Optional.of(product));
@@ -36,7 +36,7 @@ class ProductServiceBusinessRulesTest {
     @Test
     void suspendedProductCanBePublishedByItsSeller() {
         ProductRepositoryPort repository = mock(ProductRepositoryPort.class);
-        ProductService service = service(repository);
+        ProductLifecycleService service = lifecycleService(repository);
         Seller seller = activeSeller();
         DigitalProduct product = product(seller, ProductStatus.SUSPENDED);
         when(repository.findByIdentifier(product)).thenReturn(Optional.of(product));
@@ -45,13 +45,36 @@ class ProductServiceBusinessRulesTest {
         assertEquals(ProductStatus.PUBLISHED, service.publish(seller, product).getStatus());
     }
 
-    private ProductService service(ProductRepositoryPort repository) {
-        return new ProductService(repository,
+    @Test
+    void publishedProductCanBeSuspendedByItsSeller() {
+        ProductRepositoryPort repository = mock(ProductRepositoryPort.class);
+        ProductLifecycleService service = lifecycleService(repository);
+        Seller seller = activeSeller();
+        DigitalProduct product = product(seller, ProductStatus.PUBLISHED);
+        when(repository.findByIdentifier(product)).thenReturn(Optional.of(product));
+        when(repository.update(product)).thenReturn(product);
+
+        assertEquals(ProductStatus.SUSPENDED, service.suspend(seller, product).getStatus());
+    }
+
+    @Test
+    void discontinuedProductCannotBeDiscontinuedAgain() {
+        ProductRepositoryPort repository = mock(ProductRepositoryPort.class);
+        ProductLifecycleService service = lifecycleService(repository);
+        Seller seller = activeSeller();
+        DigitalProduct product = product(seller, ProductStatus.DISCONTINUED);
+        when(repository.findByIdentifier(product)).thenReturn(Optional.of(product));
+
+        assertThrows(DomainValidationException.class, () -> service.discontinue(seller, product));
+    }
+
+    private ProductLifecycleService lifecycleService(ProductRepositoryPort repository) {
+        return new ProductLifecycleService(repository,
+                new ProductQueryService(repository),
                 new ValidateActiveUserService(),
                 new ValidateRoleService(),
                 new ValidateOwnershipService());
     }
-
 
     private Seller activeSeller() {
         Seller seller = new Seller();
