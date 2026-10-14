@@ -76,4 +76,32 @@ class AuthControllerApiTest {
                         .content("{\"email\":\"a@b.test\",\"password\":\"p\"}"))
                 .andExpect(status().isUnauthorized());
     }
+
+    @Test
+    void blankEmailIsRejectedWithBadRequest() throws Exception {
+        mockMvc.perform(post("/api/v1/auth/login")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("{\"email\":\"\",\"password\":\"secret\"}"))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.status").value(400))
+                .andExpect(jsonPath("$.message").value("email is required"));
+    }
+
+    @Test
+    void malformedEmailIsRejectedWithBadRequest() throws Exception {
+        mockMvc.perform(post("/api/v1/auth/login")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("{\"email\":\"not-an-email\",\"password\":\"secret\"}"))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.message").value("email must be valid"));
+    }
+
+    @Test
+    void blankPasswordIsRejectedWithBadRequest() throws Exception {
+        mockMvc.perform(post("/api/v1/auth/login")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("{\"email\":\"user@example.test\",\"password\":\"\"}"))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.message").value("password is required"));
+    }
 }

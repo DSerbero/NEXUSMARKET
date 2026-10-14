@@ -2,6 +2,8 @@ package app.adapters.rest.exception;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.FieldError;
+import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
@@ -43,6 +45,15 @@ public class RestExceptionHandler {
     @ExceptionHandler(ValidationException.class)
     public ResponseEntity<ApiErrorResponse> handleValidation(ValidationException ex) {
         return build(HttpStatus.BAD_REQUEST, "Bad Request", ex.getMessage());
+    }
+
+    @ExceptionHandler(MethodArgumentNotValidException.class)
+    public ResponseEntity<ApiErrorResponse> handleBeanValidation(MethodArgumentNotValidException ex) {
+        String message = ex.getBindingResult().getFieldErrors().stream()
+                .map(FieldError::getDefaultMessage)
+                .findFirst()
+                .orElse("Validation failed");
+        return build(HttpStatus.BAD_REQUEST, "Bad Request", message);
     }
 
     private ResponseEntity<ApiErrorResponse> build(HttpStatus status, String error, String message) {

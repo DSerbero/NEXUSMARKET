@@ -5,6 +5,8 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import jakarta.validation.Valid;
+
 import app.adapters.rest.dtos.requests.LoginRequest;
 import app.adapters.rest.dtos.responses.LoginResponse;
 import app.domain.ports.in.AuthenticationPort;
@@ -25,7 +27,7 @@ public class AuthController {
     private final AuthenticationPort authenticationPort;
 
     @PostMapping("/login")
-    public LoginResponse login(@RequestBody LoginRequest request) {
+    public LoginResponse login(@Valid @RequestBody LoginRequest request) {
         LoginResult result = authenticationPort.login(request.email(), request.password());
         return LoginResponse.bearer(result.token(), result.user().getIdentifier(), result.user().getRole().getCode());
     }
