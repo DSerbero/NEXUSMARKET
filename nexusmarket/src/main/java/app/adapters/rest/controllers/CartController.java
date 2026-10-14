@@ -16,6 +16,7 @@ import app.adapters.rest.dtos.requests.AddCartItemRequest;
 import app.adapters.rest.dtos.responses.CartResponse;
 import app.adapters.rest.dtos.responses.OrderResponse;
 import app.adapters.rest.mappers.CartRestMapper;
+import app.adapters.rest.mappers.OrderRestMapper;
 import app.domain.exceptions.InvalidCredentialsException;
 import app.domain.ports.in.CartPort;
 import app.domain.models.Buyer;
@@ -36,6 +37,7 @@ public class CartController {
 
     private final CartPort cartPort;
     private final CartRestMapper cartRestMapper;
+    private final OrderRestMapper orderRestMapper;
 
     @GetMapping
     public CartResponse consult() {
@@ -57,7 +59,7 @@ public class CartController {
     @PostMapping("/checkout")
     @ResponseStatus(HttpStatus.CREATED)
     public OrderResponse confirm() {
-        return cartRestMapper.toOrderResponse(cartPort.confirm(currentBuyer()));
+        return orderRestMapper.toResponse(cartPort.confirm(currentBuyer()));
     }
 
     private Buyer currentBuyer() {

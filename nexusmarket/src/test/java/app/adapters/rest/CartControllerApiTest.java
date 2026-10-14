@@ -27,6 +27,7 @@ import org.springframework.test.web.servlet.MockMvc;
 
 import app.adapters.rest.controllers.CartController;
 import app.adapters.rest.mappers.CartRestMapper;
+import app.adapters.rest.mappers.OrderRestMapper;
 import app.domain.exceptions.DomainValidationException;
 import app.domain.models.Buyer;
 import app.domain.models.Cart;
@@ -41,7 +42,7 @@ import app.domain.valueobjects.OrderStatus;
 import app.domain.valueobjects.ProductStatus;
 
 @WebMvcTest(CartController.class)
-@Import(CartRestMapper.class)
+@Import({CartRestMapper.class, OrderRestMapper.class})
 class CartControllerApiTest {
 
     @Autowired
