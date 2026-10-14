@@ -85,7 +85,13 @@ public class JpaCartRepositoryAdapter implements CartRepositoryPort {
         } else if (cart.getCreationDate() != null) {
             entity.setCreationDate(cart.getCreationDate());
         }
+        // Se reemplaza la coleccion de items por completo. Con orphanRemoval y el
+        // indice unico uk_cart_item_position, Hibernate ejecuta los INSERT de las
+        // filas nuevas ANTES de los DELETE de las viejas, por lo que un item en la
+        // misma posicion colisiona. Forzando flush() justo despues de clear() los
+        // DELETE se ejecutan primero y se liberan las posiciones (cart, position).
         entity.getItems().clear();
+        entityManager.flush();
         int position = 0;
         for (CartItem item : cart.getItems()) {
             Product product = item.getProduct();
