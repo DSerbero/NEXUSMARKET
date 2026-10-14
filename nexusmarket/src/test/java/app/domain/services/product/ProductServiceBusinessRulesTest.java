@@ -13,6 +13,9 @@ import app.domain.exceptions.DomainValidationException;
 import app.domain.models.DigitalProduct;
 import app.domain.models.Seller;
 import app.domain.ports.out.ProductRepositoryPort;
+import app.domain.services.authorization.ValidateActiveUserService;
+import app.domain.services.authorization.ValidateOwnershipService;
+import app.domain.services.authorization.ValidateRoleService;
 import app.domain.valueobjects.ProductStatus;
 import app.domain.valueobjects.UserRole;
 import app.domain.valueobjects.UserStatus;
@@ -22,7 +25,7 @@ class ProductServiceBusinessRulesTest {
     @Test
     void publishingAlreadyPublishedProductIsRejected() {
         ProductRepositoryPort repository = mock(ProductRepositoryPort.class);
-        ProductService service = new ProductService(repository);
+        ProductService service = service(repository);
         Seller seller = activeSeller();
         DigitalProduct product = product(seller, ProductStatus.PUBLISHED);
         when(repository.findByIdentifier(product)).thenReturn(Optional.of(product));
@@ -33,7 +36,7 @@ class ProductServiceBusinessRulesTest {
     @Test
     void suspendedProductCanBePublishedByItsSeller() {
         ProductRepositoryPort repository = mock(ProductRepositoryPort.class);
-        ProductService service = new ProductService(repository);
+        ProductService service = service(repository);
         Seller seller = activeSeller();
         DigitalProduct product = product(seller, ProductStatus.SUSPENDED);
         when(repository.findByIdentifier(product)).thenReturn(Optional.of(product));
@@ -41,6 +44,14 @@ class ProductServiceBusinessRulesTest {
 
         assertEquals(ProductStatus.PUBLISHED, service.publish(seller, product).getStatus());
     }
+
+    private ProductService service(ProductRepositoryPort repository) {
+        return new ProductService(repository,
+                new ValidateActiveUserService(),
+                new ValidateRoleService(),
+                new ValidateOwnershipService());
+    }
+
 
     private Seller activeSeller() {
         Seller seller = new Seller();

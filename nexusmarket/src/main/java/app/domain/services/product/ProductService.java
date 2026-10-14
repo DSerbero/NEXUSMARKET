@@ -1,6 +1,9 @@
 package app.domain.services.product;
 
 import app.domain.services.DomainValidations;
+import app.domain.services.authorization.ValidateActiveUserService;
+import app.domain.services.authorization.ValidateOwnershipService;
+import app.domain.services.authorization.ValidateRoleService;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
@@ -13,6 +16,7 @@ import app.domain.models.Product;
 import app.domain.models.Seller;
 import app.domain.models.User;
 import app.domain.exceptions.DomainValidationException;
+import app.domain.exceptions.EntityNotFoundException;
 import app.domain.ports.out.ProductRepositoryPort;
 import app.domain.valueobjects.ProductStatus;
 import app.domain.valueobjects.UserRole;
@@ -24,10 +28,13 @@ import lombok.RequiredArgsConstructor;
 public class ProductService {
 
     private final ProductRepositoryPort productRepository;
+    private final ValidateActiveUserService validateActiveUser;
+    private final ValidateRoleService validateRole;
+    private final ValidateOwnershipService validateOwnership;
 
     public Product register(Seller seller, Product product) {
-        DomainValidations.active(seller);
-        requireSeller(seller);
+        validateActiveUser.execute(seller);
+        validateRole.execute(seller, UserRole.SELLER);
         DomainValidations.required(product, "product");
         validateProduct(product);
         product.setSeller(seller);
@@ -36,7 +43,7 @@ public class ProductService {
     }
 
     public Product consult(User requestingUser, Product product) {
-        DomainValidations.active(requestingUser);
+        validateActiveUser.execute(requestingUser);
         Product current = authoritative(product);
         boolean publicProduct = ProductStatus.PUBLISHED.equals(current.getStatus());
         boolean privilegedReader = UserRole.ADMIN.equals(requestingUser.getRole())
@@ -57,10 +64,10 @@ public class ProductService {
     }
 
     public Product update(Seller seller, Product product) {
-        DomainValidations.active(seller);
-        requireSeller(seller);
+        validateActiveUser.execute(seller);
+        validateRole.execute(seller, UserRole.SELLER);
         Product current = authoritative(product);
-        requireOwner(seller, current);
+        validateOwnership.execute(seller, current.getSeller());
         if (ProductStatus.DISCONTINUED.equals(current.getStatus())) {
             throw new DomainValidationException("Discontinued product cannot be updated");
         }
@@ -86,10 +93,10 @@ public class ProductService {
     }
 
     public Product discontinue(Seller seller, Product product) {
-        DomainValidations.active(seller);
-        requireSeller(seller);
+        validateActiveUser.execute(seller);
+        validateRole.execute(seller, UserRole.SELLER);
         Product current = authoritative(product);
-        requireOwner(seller, current);
+        validateOwnership.execute(seller, current.getSeller());
         if (!ProductStatus.PUBLISHED.equals(current.getStatus())
                 && !ProductStatus.SUSPENDED.equals(current.getStatus())) {
             throw new DomainValidationException("Product cannot be discontinued from its current status");
@@ -99,10 +106,10 @@ public class ProductService {
     }
 
     private Product updateStatus(Seller seller, Product product, ProductStatus expected, ProductStatus next) {
-        DomainValidations.active(seller);
-        requireSeller(seller);
+        validateActiveUser.execute(seller);
+        validateRole.execute(seller, UserRole.SELLER);
         Product current = authoritative(product);
-        requireOwner(seller, current);
+        validateOwnership.execute(seller, current.getSeller());
         if (!expected.equals(current.getStatus())) {
             throw new DomainValidationException("Invalid product status transition");
         }
@@ -113,19 +120,7 @@ public class ProductService {
     private Product authoritative(Product product) {
         DomainValidations.required(product, "product");
         return productRepository.findByIdentifier(product)
-                .orElseThrow(() -> new DomainValidationException("Product not found"));
-    }
-
-    private void requireOwner(Seller seller, Product product) {
-        if (!DomainValidations.sameIdentity(seller, product.getSeller())) {
-            throw new DomainValidationException("Seller does not own product");
-        }
-    }
-
-    private void requireSeller(Seller seller) {
-        if (!UserRole.SELLER.equals(seller.getRole())) {
-            throw new DomainValidationException("Only sellers can manage products");
-        }
+                .orElseThrow(() -> new EntityNotFoundException("Product"));
     }
 
     private void validateProduct(Product product) {
