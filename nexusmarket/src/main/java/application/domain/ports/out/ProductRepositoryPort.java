@@ -1,0 +1,13 @@
+package application.domain.ports.out;
+
+import java.util.List;
+import java.util.Optional;
+
+import application.domain.models.Product;
+
+public interface ProductRepositoryPort {
+    Product save(Product product);
+    Optional<Product> findByIdentifier(Product product);
+    List<Product> findBySeller(Product product);
+    Product update(Product product);
+}

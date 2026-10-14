@@ -446,6 +446,16 @@ Los controllers no deben implementar:
 * Reglas de transición de estado.
 * Persistencia.
 
+## REST API inicial
+
+```http
+GET /api/v1/products/{identifier}
+```
+
+La consulta requiere autenticación y devuelve únicamente productos `PUBLISHED`. Los productos no publicados y los identificadores inexistentes se exponen como `404` para no revelar el catálogo privado de un seller. La respuesta usa un DTO REST y no una entidad Mongo.
+
+No se define aún una operación para listar el catálogo completo ni para registrar productos; esos contratos se agregarán junto con los flujos de seller y autenticación de negocio.
+
 ---
 
 # 23. Validation Matrix

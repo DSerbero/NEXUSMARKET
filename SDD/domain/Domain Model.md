@@ -120,6 +120,7 @@ Esta clase no puede instanciarse directamente.
 
 | Attribute | Type | Description |
 |-----------|------|-------------|
+| identifier | String (UUID) | Identificador único del producto. |
 | price | BigDecimal | Precio de venta del producto. |
 | variants | List\<String\> | Diferencias como color, talla, modelo, etc. |
 | status | ProductStatus | Publicado, Suspendido o Descontinuado. |
