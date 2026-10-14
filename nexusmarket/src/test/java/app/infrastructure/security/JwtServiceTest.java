@@ -2,7 +2,6 @@ package app.infrastructure.security;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.util.Optional;
@@ -12,8 +11,7 @@ import org.junit.jupiter.api.Test;
 import app.domain.models.User;
 import app.domain.valueobjects.UserRole;
 import app.domain.valueobjects.UserStatus;
-
-import io.jsonwebtoken.Claims;
+import app.domain.valueobjects.TokenClaims;
 
 class JwtServiceTest {
 
@@ -35,12 +33,11 @@ class JwtServiceTest {
     void generatedTokenCarriesSubjectAndRoleAndCanBeParsed() {
         String token = jwtService.generateToken(user());
 
-        Optional<Claims> claims = jwtService.parseToken(token);
+        Optional<TokenClaims> claims = jwtService.parseToken(token);
 
         assertTrue(claims.isPresent());
-        assertEquals("user-1", claims.get().getSubject());
-        assertEquals("BUYER", claims.get().get("role", String.class));
-        assertNotNull(claims.get().getExpiration());
+        assertEquals("user-1", claims.get().subject());
+        assertEquals("BUYER", claims.get().role());
     }
 
     @Test

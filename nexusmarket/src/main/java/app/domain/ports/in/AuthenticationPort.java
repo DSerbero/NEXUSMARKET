@@ -9,5 +9,5 @@ import app.domain.models.User;
  */
 public interface AuthenticationPort {
 
-    User login(String email, String password);
+    LoginResult login(String email, String password);
 }

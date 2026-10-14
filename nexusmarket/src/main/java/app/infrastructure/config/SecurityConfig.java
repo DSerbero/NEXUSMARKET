@@ -12,8 +12,8 @@ import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.HttpStatusEntryPoint;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
+import app.domain.ports.out.JwtServicePort;
 import app.infrastructure.security.JwtAuthenticationFilter;
-import app.infrastructure.security.JwtService;
 
 /**
  * Stateless JWT security configuration. The login endpoint is public; every
@@ -29,8 +29,8 @@ public class SecurityConfig {
     }
 
     @Bean
-    public JwtAuthenticationFilter jwtAuthenticationFilter(JwtService jwtService) {
-        return new JwtAuthenticationFilter(jwtService);
+    public JwtAuthenticationFilter jwtAuthenticationFilter(JwtServicePort jwtServicePort) {
+        return new JwtAuthenticationFilter(jwtServicePort);
     }
 
     @Bean

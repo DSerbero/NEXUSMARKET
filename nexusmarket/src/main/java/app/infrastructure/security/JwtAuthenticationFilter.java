@@ -8,7 +8,8 @@ import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.filter.OncePerRequestFilter;
 
-import io.jsonwebtoken.Claims;
+import app.domain.ports.out.JwtServicePort;
+
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -30,12 +31,11 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
     private static final String HEADER = "Authorization";
     private static final String PREFIX = "Bearer ";
-    private static final String ROLE_CLAIM = "role";
 
-    private final JwtService jwtService;
+    private final JwtServicePort jwtServicePort;
 
-    public JwtAuthenticationFilter(JwtService jwtService) {
-        this.jwtService = jwtService;
+    public JwtAuthenticationFilter(JwtServicePort jwtServicePort) {
+        this.jwtServicePort = jwtServicePort;
     }
 
     @Override
@@ -45,11 +45,9 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         if (header != null && header.startsWith(PREFIX)
                 && SecurityContextHolder.getContext().getAuthentication() == null) {
             String token = header.substring(PREFIX.length());
-            jwtService.parseToken(token).ifPresent(claims -> {
-                String identifier = claims.getSubject();
-                String role = claims.get(ROLE_CLAIM, String.class);
-                var authorities = List.of(new SimpleGrantedAuthority("ROLE_" + role));
-                var authentication = new UsernamePasswordAuthenticationToken(identifier, null, authorities);
+            jwtServicePort.parseToken(token).ifPresent(claims -> {
+                var authorities = List.of(new SimpleGrantedAuthority("ROLE_" + claims.role()));
+                var authentication = new UsernamePasswordAuthenticationToken(claims.subject(), null, authorities);
                 SecurityContextHolder.getContext().setAuthentication(authentication);
             });
         }

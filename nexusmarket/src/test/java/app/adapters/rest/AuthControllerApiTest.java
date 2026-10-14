@@ -1,7 +1,5 @@
 package app.adapters.rest;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
@@ -17,12 +15,12 @@ import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 
 import app.adapters.rest.controllers.AuthController;
-import app.domain.exceptions.DomainValidationException;
+import app.domain.exceptions.InvalidCredentialsException;
 import app.domain.models.User;
 import app.domain.ports.in.AuthenticationPort;
+import app.domain.ports.in.LoginResult;
 import app.domain.valueobjects.UserRole;
 import app.domain.valueobjects.UserStatus;
-import app.infrastructure.security.JwtService;
 
 /**
  * Controller slice test. Security filters are disabled so this test focuses on
@@ -39,17 +37,14 @@ class AuthControllerApiTest {
     @MockitoBean
     private AuthenticationPort authenticationPort;
 
-    @MockitoBean
-    private JwtService jwtService;
-
     @Test
     void validLoginReturnsAccessToken() throws Exception {
         User user = new User();
         user.setIdentifier("user-1");
         user.setRole(UserRole.BUYER);
         user.setStatus(UserStatus.ACTIVE);
-        when(authenticationPort.login("user@example.test", "secret")).thenReturn(user);
-        when(jwtService.generateToken(any(User.class))).thenReturn("header.payload.signature");
+        when(authenticationPort.login("user@example.test", "secret"))
+                .thenReturn(new LoginResult(user, "header.payload.signature"));
 
         mockMvc.perform(post("/api/v1/auth/login")
                         .contentType(MediaType.APPLICATION_JSON)
@@ -64,7 +59,7 @@ class AuthControllerApiTest {
     @Test
     void invalidCredentialsReturnUnauthorized() throws Exception {
         when(authenticationPort.login(anyString(), anyString()))
-                .thenThrow(new DomainValidationException("Invalid credentials or inactive user"));
+                .thenThrow(new InvalidCredentialsException());
 
         mockMvc.perform(post("/api/v1/auth/login")
                         .contentType(MediaType.APPLICATION_JSON)
@@ -75,11 +70,10 @@ class AuthControllerApiTest {
     @Test
     void loginRequestIsBoundFromJson() throws Exception {
         // Sanity check that the record DTO is deserialized (email/password wired).
-        when(authenticationPort.login("a@b.test", "p")).thenThrow(new DomainValidationException("bad"));
+        when(authenticationPort.login("a@b.test", "p")).thenThrow(new InvalidCredentialsException());
         mockMvc.perform(post("/api/v1/auth/login")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content("{\"email\":\"a@b.test\",\"password\":\"p\"}"))
                 .andExpect(status().isUnauthorized());
-        assertEquals(401, 401);
     }
 }
