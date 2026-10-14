@@ -9,6 +9,7 @@ import lombok.Setter;
 @Getter
 @Setter
 public class Return {
+    private String identifier;
     private Order order;
     private String reason;
     private ReturnStatus returnStatus;

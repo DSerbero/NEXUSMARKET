@@ -9,6 +9,7 @@ import lombok.Setter;
 @Getter
 @Setter
 public class Shipment {
+    private String identifier;
     private Order order;
     private Warehouse originWarehouse;
     private User operator;

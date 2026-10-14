@@ -10,6 +10,7 @@ import lombok.Setter;
 @Setter
 @Getter
 public class Refund {
+    private String identifier;
     private Return relatedReturn;
     private BigDecimal refundedAmount;
     private String currencyCode;

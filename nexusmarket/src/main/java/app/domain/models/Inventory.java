@@ -9,6 +9,7 @@ import lombok.Setter;
 @Setter
 @Getter
 public class Inventory {
+    private String identifier;
     private PhysicalProduct product;
     private Warehouse warehouse;
     private Integer availableQuantity;

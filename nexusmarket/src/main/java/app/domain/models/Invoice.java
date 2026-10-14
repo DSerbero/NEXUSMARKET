@@ -10,6 +10,7 @@ import lombok.Setter;
 @Setter
 @Getter
 public class Invoice {
+    private String identifier;
     private Order order;
     private BigDecimal totalAmount;
     private String currencyCode;
