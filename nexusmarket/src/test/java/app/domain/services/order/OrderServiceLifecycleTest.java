@@ -21,7 +21,7 @@ class OrderServiceLifecycleTest {
     @Test
     void digitalOnlyOrderCanFinalizeDirectlyAfterPayment() {
         OrderRepositoryPort orderRepository = mock(OrderRepositoryPort.class);
-        OrderService service = new OrderService(orderRepository);
+        FinalizeOrderService service = new FinalizeOrderService(orderRepository);
         Order order = new Order();
         order.setOrderStatus(OrderStatus.PAID);
         order.getItems().add(new OrderItemSnapshot(
@@ -29,7 +29,7 @@ class OrderServiceLifecycleTest {
         when(orderRepository.findByIdentifier(order)).thenReturn(Optional.of(order));
         when(orderRepository.update(order)).thenReturn(order);
 
-        assertEquals(OrderStatus.DELIVERED_FINALIZED, service.finalizeOrder(order).getOrderStatus());
+        assertEquals(OrderStatus.DELIVERED_FINALIZED, service.execute(order).getOrderStatus());
     }
 
     private DigitalProduct digitalProduct(String identifier, BigDecimal price, ProductStatus status) {

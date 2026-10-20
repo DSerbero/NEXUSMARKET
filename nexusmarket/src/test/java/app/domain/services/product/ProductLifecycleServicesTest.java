@@ -20,60 +20,56 @@ import app.domain.valueobjects.ProductStatus;
 import app.domain.valueobjects.UserRole;
 import app.domain.valueobjects.UserStatus;
 
-class ProductLifecycleServiceTest {
+/** Product status state machine: publish, suspend, discontinue. */
+class ProductLifecycleServicesTest {
+
+    private final ProductRepositoryPort repository = mock(ProductRepositoryPort.class);
+    private final PublishProductService publish = new PublishProductService(
+            repository, new ProductQueryService(repository),
+            new ValidateActiveUserService(), new ValidateRoleService(), new ValidateOwnershipService());
+    private final SuspendProductService suspend = new SuspendProductService(
+            repository, new ProductQueryService(repository),
+            new ValidateActiveUserService(), new ValidateRoleService(), new ValidateOwnershipService());
+    private final DiscontinueProductService discontinue = new DiscontinueProductService(
+            repository, new ProductQueryService(repository),
+            new ValidateActiveUserService(), new ValidateRoleService(), new ValidateOwnershipService());
 
     @Test
     void publishingAlreadyPublishedProductIsRejected() {
-        ProductRepositoryPort repository = mock(ProductRepositoryPort.class);
-        ProductLifecycleService service = lifecycleService(repository);
         Seller seller = activeSeller();
         DigitalProduct product = product(seller, ProductStatus.PUBLISHED);
         when(repository.findByIdentifier(product)).thenReturn(Optional.of(product));
 
-        assertThrows(DomainValidationException.class, () -> service.publish(seller, product));
+        assertThrows(DomainValidationException.class, () -> publish.execute(seller, product));
     }
 
     @Test
     void suspendedProductCanBePublishedByItsSeller() {
-        ProductRepositoryPort repository = mock(ProductRepositoryPort.class);
-        ProductLifecycleService service = lifecycleService(repository);
         Seller seller = activeSeller();
         DigitalProduct product = product(seller, ProductStatus.SUSPENDED);
         when(repository.findByIdentifier(product)).thenReturn(Optional.of(product));
         when(repository.update(product)).thenReturn(product);
 
-        assertEquals(ProductStatus.PUBLISHED, service.publish(seller, product).getStatus());
+        assertEquals(ProductStatus.PUBLISHED, publish.execute(seller, product).getStatus());
     }
 
     @Test
     void publishedProductCanBeSuspendedByItsSeller() {
-        ProductRepositoryPort repository = mock(ProductRepositoryPort.class);
-        ProductLifecycleService service = lifecycleService(repository);
         Seller seller = activeSeller();
         DigitalProduct product = product(seller, ProductStatus.PUBLISHED);
         when(repository.findByIdentifier(product)).thenReturn(Optional.of(product));
         when(repository.update(product)).thenReturn(product);
 
-        assertEquals(ProductStatus.SUSPENDED, service.suspend(seller, product).getStatus());
+        assertEquals(ProductStatus.SUSPENDED, suspend.execute(seller, product).getStatus());
     }
 
     @Test
     void discontinuedProductCannotBeDiscontinuedAgain() {
-        ProductRepositoryPort repository = mock(ProductRepositoryPort.class);
-        ProductLifecycleService service = lifecycleService(repository);
         Seller seller = activeSeller();
         DigitalProduct product = product(seller, ProductStatus.DISCONTINUED);
         when(repository.findByIdentifier(product)).thenReturn(Optional.of(product));
 
-        assertThrows(DomainValidationException.class, () -> service.discontinue(seller, product));
-    }
-
-    private ProductLifecycleService lifecycleService(ProductRepositoryPort repository) {
-        return new ProductLifecycleService(repository,
-                new ProductQueryService(repository),
-                new ValidateActiveUserService(),
-                new ValidateRoleService(),
-                new ValidateOwnershipService());
+        assertThrows(DomainValidationException.class, () -> discontinue.execute(seller, product));
     }
 
     private Seller activeSeller() {

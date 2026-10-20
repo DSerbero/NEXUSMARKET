@@ -24,14 +24,15 @@ import app.domain.valueobjects.ProductStatus;
 import app.domain.valueobjects.UserRole;
 import app.domain.valueobjects.UserStatus;
 
-class ProductCatalogServiceTest {
+/** Write-side catalog rules: registration and update of commercial data. */
+class ProductCatalogWriteServicesTest {
 
     private final ProductRepositoryPort repository = mock(ProductRepositoryPort.class);
-    private final ProductCatalogService service = new ProductCatalogService(repository,
-            new ProductQueryService(repository),
-            new ValidateActiveUserService(),
-            new ValidateRoleService(),
-            new ValidateOwnershipService());
+    private final RegisterProductService register = new RegisterProductService(
+            repository, new ValidateActiveUserService(), new ValidateRoleService());
+    private final UpdateProductService update = new UpdateProductService(
+            repository, new ProductQueryService(repository),
+            new ValidateActiveUserService(), new ValidateRoleService(), new ValidateOwnershipService());
 
     @Test
     void registerPublishesValidDigitalProduct() {
@@ -41,7 +42,7 @@ class ProductCatalogServiceTest {
         product.setDigitalAsset("asset-ref");
         when(repository.save(product)).thenReturn(product);
 
-        assertEquals(ProductStatus.PUBLISHED, service.register(seller, product).getStatus());
+        assertEquals(ProductStatus.PUBLISHED, register.execute(seller, product).getStatus());
         assertEquals(seller, product.getSeller());
     }
 
@@ -52,7 +53,7 @@ class ProductCatalogServiceTest {
         product.setPrice(BigDecimal.ZERO);
         product.setDigitalAsset("asset-ref");
 
-        assertThrows(DomainValidationException.class, () -> service.register(seller, product));
+        assertThrows(DomainValidationException.class, () -> register.execute(seller, product));
     }
 
     @Test
@@ -61,7 +62,7 @@ class ProductCatalogServiceTest {
         DigitalProduct product = new DigitalProduct();
         product.setPrice(new BigDecimal("10.00"));
 
-        assertThrows(DomainValidationException.class, () -> service.register(seller, product));
+        assertThrows(DomainValidationException.class, () -> register.execute(seller, product));
     }
 
     @Test
@@ -73,12 +74,12 @@ class ProductCatalogServiceTest {
         current.setStatus(ProductStatus.DISCONTINUED);
         when(repository.findByIdentifier(any(Product.class))).thenReturn(Optional.of(current));
 
-        DigitalProduct update = new DigitalProduct();
-        update.setIdentifier("product-1");
-        update.setPrice(new BigDecimal("20.00"));
-        update.setDigitalAsset("asset-ref");
+        DigitalProduct change = new DigitalProduct();
+        change.setIdentifier("product-1");
+        change.setPrice(new BigDecimal("20.00"));
+        change.setDigitalAsset("asset-ref");
 
-        assertThrows(DomainValidationException.class, () -> service.update(seller, update));
+        assertThrows(DomainValidationException.class, () -> update.execute(seller, change));
     }
 
     @Test
@@ -90,46 +91,11 @@ class ProductCatalogServiceTest {
         current.setStatus(ProductStatus.PUBLISHED);
         when(repository.findByIdentifier(any(Product.class))).thenReturn(Optional.of(current));
 
-        PhysicalProduct update = new PhysicalProduct();
-        update.setIdentifier("product-1");
-        update.setPrice(new BigDecimal("20.00"));
+        PhysicalProduct change = new PhysicalProduct();
+        change.setIdentifier("product-1");
+        change.setPrice(new BigDecimal("20.00"));
 
-        assertThrows(DomainValidationException.class, () -> service.update(seller, update));
-    }
-
-    @Test
-    void consultPublishedRejectsNonPublishedProduct() {
-        DigitalProduct product = new DigitalProduct();
-        product.setIdentifier("product-1");
-        product.setStatus(ProductStatus.SUSPENDED);
-        when(repository.findByIdentifier(product)).thenReturn(Optional.of(product));
-
-        assertThrows(DomainValidationException.class, () -> service.consultPublished(product));
-    }
-
-    @Test
-    void consultPublishedReturnsPublishedProduct() {
-        DigitalProduct product = new DigitalProduct();
-        product.setIdentifier("product-1");
-        product.setStatus(ProductStatus.PUBLISHED);
-        when(repository.findByIdentifier(product)).thenReturn(Optional.of(product));
-
-        assertEquals(ProductStatus.PUBLISHED, service.consultPublished(product).getStatus());
-    }
-
-    @Test
-    void sellerCannotConsultAnotherSellersPrivateProduct() {
-        Seller owner = activeSeller();
-        owner.setIdentifier("seller-owner");
-        Seller stranger = activeSeller();
-        stranger.setIdentifier("seller-stranger");
-        DigitalProduct product = new DigitalProduct();
-        product.setIdentifier("product-1");
-        product.setSeller(owner);
-        product.setStatus(ProductStatus.SUSPENDED);
-        when(repository.findByIdentifier(product)).thenReturn(Optional.of(product));
-
-        assertThrows(DomainValidationException.class, () -> service.consult(stranger, product));
+        assertThrows(DomainValidationException.class, () -> update.execute(seller, change));
     }
 
     private Seller activeSeller() {

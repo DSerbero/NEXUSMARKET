@@ -12,7 +12,9 @@ import app.domain.ports.out.UserRepositoryPort;
 import app.domain.services.authorization.ValidateActiveUserService;
 import app.domain.services.authorization.ValidateOwnershipService;
 import app.domain.services.authorization.ValidateRoleService;
-import app.domain.services.order.OrderService;
+import app.domain.services.order.ConfirmOrderPaymentService;
+import app.domain.services.order.DispatchOrderService;
+import app.domain.services.order.FinalizeOrderService;
 import app.domain.valueobjects.UserRole;
 import lombok.RequiredArgsConstructor;
 
@@ -21,16 +23,19 @@ import lombok.RequiredArgsConstructor;
  * authoritative user and order, applies the per-operation authorization from
  * the SDD (owning buyer for consult/pay/finalize, logistics operator for
  * dispatch) using the reusable authorization collaborators, and delegates the
- * lifecycle transition to {@link OrderService}; it adds no business rules.
+ * lifecycle transition to the corresponding single-operation service; it adds
+ * no business rules.
  */
 @Service
-@ConditionalOnBean(OrderService.class)
+@ConditionalOnBean({ConfirmOrderPaymentService.class, DispatchOrderService.class, FinalizeOrderService.class})
 @RequiredArgsConstructor
 public class OrderUseCaseImpl implements OrderPort {
 
     private final UserRepositoryPort userRepository;
     private final OrderRepositoryPort orderRepository;
-    private final OrderService orderService;
+    private final ConfirmOrderPaymentService confirmOrderPayment;
+    private final DispatchOrderService dispatchOrder;
+    private final FinalizeOrderService finalizeOrder;
     private final ValidateActiveUserService validateActiveUser;
     private final ValidateRoleService validateRole;
     private final ValidateOwnershipService validateOwnership;
@@ -50,7 +55,7 @@ public class OrderUseCaseImpl implements OrderPort {
         validateActiveUser.execute(user);
         Order current = authoritativeOrder(order);
         validateOwnership.execute(user, current.getBuyer());
-        return orderService.confirmPayment(current);
+        return confirmOrderPayment.execute(current);
     }
 
     @Override
@@ -58,7 +63,7 @@ public class OrderUseCaseImpl implements OrderPort {
         User user = authoritativeUser(requestingUser);
         validateActiveUser.execute(user);
         validateRole.execute(user, UserRole.LOGISTICS_OPERATOR);
-        return orderService.dispatch(authoritativeOrder(order));
+        return dispatchOrder.execute(authoritativeOrder(order));
     }
 
     @Override
@@ -67,7 +72,7 @@ public class OrderUseCaseImpl implements OrderPort {
         validateActiveUser.execute(user);
         Order current = authoritativeOrder(order);
         validateOwnership.execute(user, current.getBuyer());
-        return orderService.finalizeOrder(current);
+        return finalizeOrder.execute(current);
     }
 
     private User authoritativeUser(User probe) {

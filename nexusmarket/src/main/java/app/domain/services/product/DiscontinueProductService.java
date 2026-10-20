@@ -15,13 +15,13 @@ import app.domain.valueobjects.UserRole;
 import lombok.RequiredArgsConstructor;
 
 /**
- * Product status state machine: publish, suspend and discontinue. Catalog data
- * (price, variants) is handled by {@link ProductCatalogService} (SRP).
+ * Discontinue Product: (PUBLISHED | SUSPENDED) -> DISCONTINUED, performed by the
+ * owning seller. A discontinued product is terminal.
  */
 @Service
 @ConditionalOnBean(ProductRepositoryPort.class)
 @RequiredArgsConstructor
-public class ProductLifecycleService {
+public class DiscontinueProductService {
 
     private final ProductRepositoryPort productRepository;
     private final ProductQueryService productQuery;
@@ -29,15 +29,7 @@ public class ProductLifecycleService {
     private final ValidateRoleService validateRole;
     private final ValidateOwnershipService validateOwnership;
 
-    public Product publish(Seller seller, Product product) {
-        return updateStatus(seller, product, ProductStatus.SUSPENDED, ProductStatus.PUBLISHED);
-    }
-
-    public Product suspend(Seller seller, Product product) {
-        return updateStatus(seller, product, ProductStatus.PUBLISHED, ProductStatus.SUSPENDED);
-    }
-
-    public Product discontinue(Seller seller, Product product) {
+    public Product execute(Seller seller, Product product) {
         validateActiveUser.execute(seller);
         validateRole.execute(seller, UserRole.SELLER);
         Product current = productQuery.authoritative(product);
@@ -47,18 +39,6 @@ public class ProductLifecycleService {
             throw new DomainValidationException("Product cannot be discontinued from its current status");
         }
         current.setStatus(ProductStatus.DISCONTINUED);
-        return productRepository.update(current);
-    }
-
-    private Product updateStatus(Seller seller, Product product, ProductStatus expected, ProductStatus next) {
-        validateActiveUser.execute(seller);
-        validateRole.execute(seller, UserRole.SELLER);
-        Product current = productQuery.authoritative(product);
-        validateOwnership.execute(seller, current.getSeller());
-        if (!expected.equals(current.getStatus())) {
-            throw new DomainValidationException("Invalid product status transition");
-        }
-        current.setStatus(next);
         return productRepository.update(current);
     }
 }

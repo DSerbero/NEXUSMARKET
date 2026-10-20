@@ -21,7 +21,9 @@ import app.domain.ports.out.UserRepositoryPort;
 import app.domain.services.authorization.ValidateActiveUserService;
 import app.domain.services.authorization.ValidateOwnershipService;
 import app.domain.services.authorization.ValidateRoleService;
-import app.domain.services.order.OrderService;
+import app.domain.services.order.ConfirmOrderPaymentService;
+import app.domain.services.order.DispatchOrderService;
+import app.domain.services.order.FinalizeOrderService;
 import app.domain.valueobjects.UserRole;
 import app.domain.valueobjects.UserStatus;
 
@@ -29,9 +31,11 @@ class OrderUseCaseImplTest {
 
     private final UserRepositoryPort userRepository = mock(UserRepositoryPort.class);
     private final OrderRepositoryPort orderRepository = mock(OrderRepositoryPort.class);
-    private final OrderService orderService = mock(OrderService.class);
+    private final ConfirmOrderPaymentService confirmOrderPayment = mock(ConfirmOrderPaymentService.class);
+    private final DispatchOrderService dispatchOrder = mock(DispatchOrderService.class);
+    private final FinalizeOrderService finalizeOrderService = mock(FinalizeOrderService.class);
     private final OrderUseCaseImpl useCase = new OrderUseCaseImpl(
-            userRepository, orderRepository, orderService,
+            userRepository, orderRepository, confirmOrderPayment, dispatchOrder, finalizeOrderService,
             new ValidateActiveUserService(), new ValidateRoleService(), new ValidateOwnershipService());
 
     @Test
@@ -74,7 +78,7 @@ class OrderUseCaseImplTest {
         when(orderRepository.findByIdentifier(any())).thenReturn(Optional.of(stored));
         Order paid = order(buyer);
         paid.setOrderStatus(app.domain.valueobjects.OrderStatus.PAID);
-        when(orderService.confirmPayment(stored)).thenReturn(paid);
+        when(confirmOrderPayment.execute(stored)).thenReturn(paid);
 
         assertSame(paid, useCase.confirmPayment(probe("buyer-1"), probeOrder()));
     }
@@ -96,7 +100,7 @@ class OrderUseCaseImplTest {
         Order stored = order(activeBuyer());
         when(userRepository.findByIdentifier(any())).thenReturn(Optional.of(operator));
         when(orderRepository.findByIdentifier(any())).thenReturn(Optional.of(stored));
-        when(orderService.dispatch(stored)).thenReturn(stored);
+        when(dispatchOrder.execute(stored)).thenReturn(stored);
 
         assertSame(stored, useCase.dispatch(probe("operator-1"), probeOrder()));
     }

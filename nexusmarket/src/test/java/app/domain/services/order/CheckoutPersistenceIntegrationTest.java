@@ -23,7 +23,7 @@ import app.domain.ports.out.BuyerRepositoryPort;
 import app.domain.ports.out.CartRepositoryPort;
 import app.domain.ports.out.OrderRepositoryPort;
 import app.domain.ports.out.ProductRepositoryPort;
-import app.domain.services.cart.CartService;
+import app.domain.services.cart.AddProductToCartService;
 import app.domain.services.checkout.CheckoutService;
 import app.domain.valueobjects.BuyerStatus;
 import app.domain.valueobjects.ProductStatus;
@@ -49,7 +49,7 @@ class CheckoutPersistenceIntegrationTest {
     private OrderRepositoryPort orderRepository;
 
     @Autowired
-    private CartService cartService;
+    private AddProductToCartService addProductToCart;
 
     @Autowired
     private CheckoutService checkoutService;
@@ -76,8 +76,8 @@ class CheckoutPersistenceIntegrationTest {
         catalogProduct.setDigitalAsset("asset-ref");
         when(productRepository.findByIdentifier(any(Product.class))).thenReturn(Optional.of(catalogProduct));
 
-        cartService.addProduct(buyer, catalogProduct);
-        cartService.addProduct(buyer, catalogProduct);
+        addProductToCart.execute(buyer, catalogProduct);
+        addProductToCart.execute(buyer, catalogProduct);
 
         Cart cartQuery = new Cart();
         cartQuery.setBuyer(buyer);

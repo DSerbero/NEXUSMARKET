@@ -10,7 +10,9 @@ import app.domain.models.Order;
 import app.domain.models.Product;
 import app.domain.ports.in.CartPort;
 import app.domain.ports.out.BuyerRepositoryPort;
-import app.domain.services.cart.CartService;
+import app.domain.services.cart.AddProductToCartService;
+import app.domain.services.cart.ConsultCartService;
+import app.domain.services.cart.RemoveProductFromCartService;
 import app.domain.services.checkout.CheckoutService;
 import lombok.RequiredArgsConstructor;
 
@@ -21,27 +23,29 @@ import lombok.RequiredArgsConstructor;
  * services; it adds no business rules of its own.
  */
 @Service
-@ConditionalOnBean({CartService.class, CheckoutService.class})
+@ConditionalOnBean({AddProductToCartService.class, CheckoutService.class})
 @RequiredArgsConstructor
 public class CartUseCaseImpl implements CartPort {
 
     private final BuyerRepositoryPort buyerRepository;
-    private final CartService cartService;
+    private final AddProductToCartService addProductToCart;
+    private final RemoveProductFromCartService removeProductFromCart;
+    private final ConsultCartService consultCart;
     private final CheckoutService checkoutService;
 
     @Override
     public Cart consult(Buyer requestingBuyer) {
-        return cartService.consult(authoritative(requestingBuyer));
+        return consultCart.execute(authoritative(requestingBuyer));
     }
 
     @Override
     public Cart addProduct(Buyer requestingBuyer, Product product) {
-        return cartService.addProduct(authoritative(requestingBuyer), product);
+        return addProductToCart.execute(authoritative(requestingBuyer), product);
     }
 
     @Override
     public Cart removeProduct(Buyer requestingBuyer, Product product) {
-        return cartService.removeProduct(authoritative(requestingBuyer), product);
+        return removeProductFromCart.execute(authoritative(requestingBuyer), product);
     }
 
     @Override

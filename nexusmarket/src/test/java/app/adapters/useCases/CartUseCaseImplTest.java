@@ -21,7 +21,9 @@ import app.domain.models.Order;
 import app.domain.models.PhysicalProduct;
 import app.domain.models.Product;
 import app.domain.ports.out.BuyerRepositoryPort;
-import app.domain.services.cart.CartService;
+import app.domain.services.cart.AddProductToCartService;
+import app.domain.services.cart.ConsultCartService;
+import app.domain.services.cart.RemoveProductFromCartService;
 import app.domain.services.checkout.CheckoutService;
 import app.domain.valueobjects.BuyerStatus;
 import app.domain.valueobjects.UserRole;
@@ -30,10 +32,12 @@ import app.domain.valueobjects.UserStatus;
 class CartUseCaseImplTest {
 
     private final BuyerRepositoryPort buyerRepository = mock(BuyerRepositoryPort.class);
-    private final CartService cartService = mock(CartService.class);
+    private final AddProductToCartService addProductToCart = mock(AddProductToCartService.class);
+    private final RemoveProductFromCartService removeProductFromCart = mock(RemoveProductFromCartService.class);
+    private final ConsultCartService consultCart = mock(ConsultCartService.class);
     private final CheckoutService checkoutService = mock(CheckoutService.class);
     private final CartUseCaseImpl useCase =
-            new CartUseCaseImpl(buyerRepository, cartService, checkoutService);
+            new CartUseCaseImpl(buyerRepository, addProductToCart, removeProductFromCart, consultCart, checkoutService);
 
     @Test
     void consultResolvesAuthoritativeBuyerBeforeDelegating() {
@@ -41,10 +45,10 @@ class CartUseCaseImplTest {
         Buyer stored = activeBuyer();
         when(buyerRepository.findByIdentifier(probe)).thenReturn(Optional.of(stored));
         Cart cart = new Cart();
-        when(cartService.consult(stored)).thenReturn(cart);
+        when(consultCart.execute(stored)).thenReturn(cart);
 
         assertSame(cart, useCase.consult(probe));
-        verify(cartService).consult(stored);
+        verify(consultCart).execute(stored);
     }
 
     @Test
@@ -55,7 +59,7 @@ class CartUseCaseImplTest {
         Product product = new PhysicalProduct();
         product.setIdentifier("product-1");
         Cart cart = new Cart();
-        when(cartService.addProduct(same(stored), same(product))).thenReturn(cart);
+        when(addProductToCart.execute(same(stored), same(product))).thenReturn(cart);
 
         assertSame(cart, useCase.addProduct(probe, product));
     }
@@ -86,7 +90,7 @@ class CartUseCaseImplTest {
         Product product = new DigitalProduct();
         product.setIdentifier("product-1");
         Cart cart = new Cart();
-        when(cartService.removeProduct(same(stored), same(product))).thenReturn(cart);
+        when(removeProductFromCart.execute(same(stored), same(product))).thenReturn(cart);
 
         assertSame(cart, useCase.removeProduct(probe, product));
         assertEquals("buyer-1", stored.getIdentifier());
